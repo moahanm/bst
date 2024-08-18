@@ -1,4 +1,4 @@
-#include "Bst.h"
+#include "Bst.h" // dummy
 #include <cmath>
 #include <iomanip>
 #include <iostream>
@@ -6,7 +6,8 @@
 #include <vector>
 
 
-void BinarySearchTree::_insertNode(Node*& node, int data, int depth)
+template<typename T>
+void BinarySearchTree<T>::_insertNode(Node<T>*& node, T data, int depth)
 {
     if (node != nullptr)
     {
@@ -25,14 +26,16 @@ void BinarySearchTree::_insertNode(Node*& node, int data, int depth)
 }
 
 // Delete all nodes with data 'data'
-void BinarySearchTree::deleteNodes(int data)
+template<typename T>
+void BinarySearchTree<T>::deleteNodes(T data)
 {
     m_root = _deleteNodes(m_root, data);
     updateHeight();
     updateDepth();
 }
 
-Node* BinarySearchTree::_deleteNodes(Node* node, int data)
+template<typename T>
+Node<T>* BinarySearchTree<T>::_deleteNodes(Node<T>* node, T data)
 {
     if (node != nullptr)
     {
@@ -45,13 +48,13 @@ Node* BinarySearchTree::_deleteNodes(Node* node, int data)
             }
             else if (node->smaller != nullptr && node->larger == nullptr)
             {
-                Node* ptr{ node };
+                Node<T>* ptr{ node };
                 node = node->smaller;
                 delete ptr;
             }
             else if (node->smaller == nullptr && node->larger != nullptr)
             {
-                Node* ptr{ node };
+                Node<T>* ptr{ node };
                 node = node->larger;
                 delete ptr;
             }
@@ -73,25 +76,24 @@ Node* BinarySearchTree::_deleteNodes(Node* node, int data)
         return nullptr;
 }
 
-int BinarySearchTree::_deleteTree(Node*& node)
+template<typename T>
+void BinarySearchTree<T>::_deleteTree(Node<T>*& node)
 {
-    int ans{0};
     if (node != nullptr)
     {
-        ans = node->m_data;
         _deleteTree(node->smaller);
         _deleteTree(node->larger);
         delete node;
         node = nullptr;
     }
-    return ans;
 }
 
-bool BinarySearchTree::searchNode(int data)
+template<typename T>
+bool BinarySearchTree<T>::searchNode(T data)
 {
     if (m_root != nullptr)
     {
-        Node* node{ m_root };
+        Node<T>* node{ m_root };
 
         while (true)
         {
@@ -124,14 +126,16 @@ bool BinarySearchTree::searchNode(int data)
         return false;
 }
 
-void BinarySearchTree::updateHeight()
+template<typename T>
+void BinarySearchTree<T>::updateHeight()
 {
     _resetHeight(m_root);
     _updateHeight(m_root);
 }
 
 // Reset height values for all nodes with root 'node' inclusive
-void BinarySearchTree::_resetHeight(Node*& node)
+template<typename T>
+void BinarySearchTree<T>::_resetHeight(Node<T>*& node)
 {
     if (node != nullptr)
     {
@@ -142,7 +146,8 @@ void BinarySearchTree::_resetHeight(Node*& node)
 }
 
 // Update height values for all nodes with root 'node' inclusive
-void BinarySearchTree::_updateHeight(Node*& node)
+template<typename T>
+void BinarySearchTree<T>::_updateHeight(Node<T>*& node)
 {
     if (node != nullptr)
     {
@@ -166,7 +171,8 @@ void BinarySearchTree::_updateHeight(Node*& node)
     }
 }
 
-void BinarySearchTree::_updateDepth(Node*& node, int depth)
+template<typename T>
+void BinarySearchTree<T>::_updateDepth(Node<T>*& node, int depth)
 {
     if (node != nullptr)
     {
@@ -176,7 +182,8 @@ void BinarySearchTree::_updateDepth(Node*& node, int depth)
     }
 }
 
-void BinarySearchTree::printTree()
+template<typename T>
+void BinarySearchTree<T>::printTree()
 {
     if (m_root != nullptr)
     {
@@ -210,7 +217,8 @@ void BinarySearchTree::printTree()
     }
 }
 
-void BinarySearchTree::_printNode(Node*& node, int x, int y)
+template<typename T>
+void BinarySearchTree<T>::_printNode(Node<T>*& node, int x, int y)
 {
     if (node != nullptr)
     {

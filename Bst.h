@@ -6,22 +6,26 @@
 
 constexpr int PRINTSPACE{ 3 };
 
+template<typename T>
+class BinarySearchTree;
+
+template<typename T>
 class Node
 {
-private:
-    int m_data{};
+public:
+    T m_data{};
     Node* smaller{nullptr};
     Node* larger{nullptr};
     int m_height{0};
     int m_depth{0};
 
-    Node(int data, int depth): m_data{data}, m_depth{depth}
+    Node(T data, int depth): m_data{data}, m_depth{depth}
     {
     };
 
-    int findMin()
+    T findMin()
     {
-        int ans{ m_data };
+        T ans{ m_data };
         Node* ptr{ this };
         while (ptr->smaller != nullptr)
         {
@@ -30,9 +34,9 @@ private:
         }
         return ans;
     }
-    int findMax()
+    T findMax()
     {
-        int ans{ m_data };
+        T ans{ m_data };
         Node* ptr{ this };
         while (ptr->larger != nullptr)
         {
@@ -41,27 +45,29 @@ private:
         }
         return ans;
     }
-    friend class BinarySearchTree;
+    friend class BinarySearchTree<T>;
 };
 
+
+template<typename T>
 class BinarySearchTree
 {
 private:
-    Node* m_root{nullptr};
+    Node<T>* m_root{nullptr};
     std::vector<std::string> m_lines;
 
 public:
     BinarySearchTree() = default;
 
-    BinarySearchTree(std::vector<int> list)
+    BinarySearchTree(std::vector<T> list)
     {
         for (auto& ele : list)
             insertNode(ele);
     }
 
-    void insertNode(int data){ _insertNode(m_root, data, 0); };
-    void deleteNodes(int data);
-    bool searchNode(int data);
+    void insertNode(T data){ _insertNode(m_root, data, 0); };
+    void deleteNodes(T data);
+    bool searchNode(T data);
     void updateHeight();
     void updateDepth(){ _updateDepth(m_root, 0); };
     int getHeight(){ return m_root->m_height; };
@@ -70,14 +76,15 @@ public:
     ~BinarySearchTree(){ _deleteTree(m_root); }
 
 private:
-    void _insertNode(Node*& node, int data, int depth);
-    Node* _deleteNodes(Node* node, int data);
-    int _deleteTree(Node*& node);
-    void _resetHeight(Node*& node);
-    void _updateHeight(Node*& node);
-    void _updateDepth(Node*& node, int depth);
-    void _printNode(Node*& node, int x, int y);
+    void _insertNode(Node<T>*& node, T data, int depth);
+    Node<T>* _deleteNodes(Node<T>* node, T data);
+    void _deleteTree(Node<T>*& node);
+    void _resetHeight(Node<T>*& node);
+    void _updateHeight(Node<T>*& node);
+    void _updateDepth(Node<T>*& node, int depth);
+    void _printNode(Node<T>*& node, int x, int y);
 };
 
+#include "Bst.cpp"
 
 #endif
