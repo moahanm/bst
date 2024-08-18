@@ -18,6 +18,29 @@ private:
     Node(int data, int depth): m_data{data}, m_depth{depth}
     {
     };
+
+    int findMin()
+    {
+        int ans{ m_data };
+        Node* ptr{ this };
+        while (ptr->smaller != nullptr)
+        {
+            ptr = ptr->smaller;
+            ans = ptr->m_data;
+        }
+        return ans;
+    }
+    int findMax()
+    {
+        int ans{ m_data };
+        Node* ptr{ this };
+        while (ptr->larger != nullptr)
+        {
+            ptr = ptr->larger;
+            ans = ptr->m_data;
+        }
+        return ans;
+    }
     friend class BinarySearchTree;
 };
 
@@ -48,8 +71,7 @@ public:
 
 private:
     void _insertNode(Node*& node, int data, int depth);
-    void _deleteNode(Node*& node, int data);
-    void _pruneTree(Node*& node);
+    Node* _deleteNodes(Node* node, int data);
     int _deleteTree(Node*& node);
     void _resetHeight(Node*& node);
     void _updateHeight(Node*& node);

@@ -24,141 +24,189 @@ void BinarySearchTree::_insertNode(Node*& node, int data, int depth)
     updateHeight();
 }
 
-// Delete all nodes with data 'data'
 void BinarySearchTree::deleteNodes(int data)
 {
-    if (m_root != nullptr)
-    {        
-        // non-root cases
-        _deleteNode(m_root, data);
+    m_root = _deleteNodes(m_root, data);
+    updateHeight();
+    updateDepth();
+}
 
-        // root case
-        if (m_root->m_data == data)
+Node* BinarySearchTree::_deleteNodes(Node* node, int data)
+{
+    if (node != nullptr)
+    {
+        if (node->m_data == data)
         {
-            if (m_root->m_height == 0)
+            if (node->m_height == 0)
             {
-                delete m_root;
-                m_root = nullptr;
+                delete node;
+                node = nullptr;
             }
-            else if (m_root->smaller != nullptr && m_root->larger == nullptr)
+            else if (node->smaller != nullptr && node->larger == nullptr)
             {
-                Node* ptr{m_root->smaller};
-                delete m_root;
-                m_root = ptr;
+                Node* ptr{ node };
+                node = node->smaller;
+                delete ptr;
             }
-            else if (m_root->smaller == nullptr && m_root->larger != nullptr)
+            else if (node->smaller == nullptr && node->larger != nullptr)
             {
-                Node* ptr{m_root->larger};
-                delete m_root;
-                m_root = ptr;
+                Node* ptr{ node };
+                node = node->larger;
+                delete ptr;
             }
             else
             {
-                // all duplicates in subtree should have been deleted by now
-                if (m_root->smaller->m_height > m_root->larger->m_height)   // take max of left subtree
-                {
-                    Node* maxNode{ m_root->smaller };
-                    while (maxNode->larger != nullptr)
-                        maxNode = maxNode->larger;
-                    m_root->m_data = maxNode->m_data;
-                    _deleteNode(m_root, m_root->m_data);
-                }
-                else    // take max of right subtree
-                {
-                    Node* minNode{ m_root->larger };
-                    while (minNode->smaller != nullptr)
-                        minNode = minNode->smaller;
-                    m_root->m_data = minNode->m_data;
-                    _deleteNode(m_root, m_root->m_data);
-                }
+                node->m_data = node->smaller->findMax(); // no duplicates guaranteed in smaller subtree
+                node->smaller = _deleteNodes(node->smaller, node->m_data);
             }
-            updateHeight();
         }
-
-        updateDepth();
-    }
-}
-
-// Deletes all nodes with data 'data' except root
-void BinarySearchTree::_deleteNode(Node*& node, int data)
-{
-    if (node->smaller != nullptr)
-    {
-        if (node->smaller->m_data == data)
+        if (node != nullptr)    // for leaf case
         {
-            _pruneTree(node->smaller);
-            _resetHeight(node->smaller);
-            _updateHeight(node->smaller);
+            node->smaller = _deleteNodes(node->smaller, data);
+            node->larger = _deleteNodes(node->larger, data);
         }
-        if (node->smaller != nullptr)   // might have been a deleted leaf
-            _deleteNode(node->smaller, data);
-    }
 
-    if (node->larger != nullptr)
-    {
-        if (node->larger->m_data == data)
-        {
-            _pruneTree(node->larger);
-            _resetHeight(node->larger);
-            _updateHeight(node->larger);
-        }
-        if (node->larger != nullptr)    // might have been a deleted leaf
-            _deleteNode(node->larger, data);
-    }
-}
-
-// Reconfigures subtree to remove all nodes identical to root
-void BinarySearchTree::_pruneTree(Node*& node)
-{
-    if (node->m_height == 0)   // 0 child case
-    {
-        delete node;
-        node = nullptr;
+        return node;
     }
     else
-    {
-        if (node->smaller != nullptr && node->larger == nullptr)    // 1 child case
-        {
-            Node* temp{ node };
-            node = node->smaller;
-            delete temp;
-        }
-        else if (node->smaller == nullptr && node->larger != nullptr)   // 1 child case
-        {
-            Node* temp{ node };
-            node = node->larger;
-            delete temp;
-        }
-        else    // 2 children case
-        {
-            bool duplicates{true};  // check for identical elements in subtree
-            if (node->smaller->m_height > node->larger->m_height)   // take max of left subtree
-            {
-                while (duplicates)
-                {
-                    Node* maxNode{ node->smaller };
-                    while (maxNode->larger != nullptr)
-                        maxNode = maxNode->larger;
-                    duplicates = (maxNode->m_data == node->m_data);
-                    node->m_data = maxNode->m_data;
-                    _deleteNode(node, node->m_data);
-                }
-            }
-            else    // take max of right subtree
-            {
-                while (duplicates)
-                {
-                    Node* minNode{ node->larger };
-                    while (minNode->smaller != nullptr)
-                    minNode = minNode->smaller;
-                    duplicates = (minNode->m_data == node->m_data);
-                    node->m_data = minNode->m_data;
-                    _deleteNode(node, node->m_data);
-                }
-            }
-        }
-    }
+        return nullptr;
 }
+
+// // Delete all nodes with data 'data'
+// void BinarySearchTree::deleteNodes(int data)
+// {
+//     if (m_root != nullptr)
+//     {        
+//         // non-root cases
+//         _deleteNode(m_root, data);
+
+//         // root case
+//         if (m_root->m_data == data)
+//         {
+//             if (m_root->m_height == 0)
+//             {
+//                 delete m_root;
+//                 m_root = nullptr;
+//             }
+//             else if (m_root->smaller != nullptr && m_root->larger == nullptr)
+//             {
+//                 Node* ptr{m_root->smaller};
+//                 delete m_root;
+//                 m_root = ptr;
+//             }
+//             else if (m_root->smaller == nullptr && m_root->larger != nullptr)
+//             {
+//                 Node* ptr{m_root->larger};
+//                 delete m_root;
+//                 m_root = ptr;
+//             }
+//             else
+//             {
+//                 // all duplicates in subtree should have been deleted by now
+//                 if (m_root->smaller->m_height > m_root->larger->m_height)   // take max of left subtree
+//                 {
+//                     Node* maxNode{ m_root->smaller };
+//                     while (maxNode->larger != nullptr)
+//                         maxNode = maxNode->larger;
+//                     m_root->m_data = maxNode->m_data;
+//                     _deleteNode(m_root, m_root->m_data);
+//                 }
+//                 else    // take max of right subtree
+//                 {
+//                     Node* minNode{ m_root->larger };
+//                     while (minNode->smaller != nullptr)
+//                         minNode = minNode->smaller;
+//                     m_root->m_data = minNode->m_data;
+//                     _deleteNode(m_root, m_root->m_data);
+//                 }
+//             }
+//             updateHeight();
+//         }
+
+//         updateDepth();
+//     }
+// }
+
+// // Deletes all nodes with data 'data' except root
+// void BinarySearchTree::_deleteNode(Node*& node, int data)
+// {
+//     if (node->smaller != nullptr)
+//     {
+//         if (node->smaller->m_data == data)
+//         {
+//             _pruneTree(node->smaller);
+//             _resetHeight(node->smaller);
+//             _updateHeight(node->smaller);
+//         }
+//         if (node->smaller != nullptr)   // might have been a deleted leaf
+//             _deleteNode(node->smaller, data);
+//     }
+
+//     if (node->larger != nullptr)
+//     {
+//         if (node->larger->m_data == data)
+//         {
+//             _pruneTree(node->larger);
+//             _resetHeight(node->larger);
+//             _updateHeight(node->larger);
+//         }
+//         if (node->larger != nullptr)    // might have been a deleted leaf
+//             _deleteNode(node->larger, data);
+//     }
+// }
+
+// // Reconfigures subtree to remove all nodes identical to root
+// void BinarySearchTree::_pruneTree(Node*& node)
+// {
+//     if (node->m_height == 0)   // 0 child case
+//     {
+//         delete node;
+//         node = nullptr;
+//     }
+//     else
+//     {
+//         if (node->smaller != nullptr && node->larger == nullptr)    // 1 child case
+//         {
+//             Node* temp{ node };
+//             node = node->smaller;
+//             delete temp;
+//         }
+//         else if (node->smaller == nullptr && node->larger != nullptr)   // 1 child case
+//         {
+//             Node* temp{ node };
+//             node = node->larger;
+//             delete temp;
+//         }
+//         else    // 2 children case
+//         {
+//             bool duplicates{true};  // check for identical elements in subtree
+//             if (node->smaller->m_height > node->larger->m_height)   // take max of left subtree
+//             {
+//                 while (duplicates)
+//                 {
+//                     Node* maxNode{ node->smaller };
+//                     while (maxNode->larger != nullptr)
+//                         maxNode = maxNode->larger;
+//                     duplicates = (maxNode->m_data == node->m_data);
+//                     node->m_data = maxNode->m_data;
+//                     _deleteNode(node, node->m_data);
+//                 }
+//             }
+//             else    // take max of right subtree
+//             {
+//                 while (duplicates)
+//                 {
+//                     Node* minNode{ node->larger };
+//                     while (minNode->smaller != nullptr)
+//                     minNode = minNode->smaller;
+//                     duplicates = (minNode->m_data == node->m_data);
+//                     node->m_data = minNode->m_data;
+//                     _deleteNode(node, node->m_data);
+//                 }
+//             }
+//         }
+//     }
+// }
 
 int BinarySearchTree::_deleteTree(Node*& node)
 {
