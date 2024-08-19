@@ -88,10 +88,8 @@ private:
     std::vector<std::string> m_lines;
 
     // for rotation
-    Node<T>* m_rot0{nullptr};
-    Node<T>* m_rot1{nullptr};
-    Node<T>* m_rot2{nullptr};
-    Node<T>* m_rot3{nullptr};
+    Node<T>* m_ptrParent{nullptr};
+    Node<T>* m_ptrRot{nullptr};
 
 public:
     BinarySearchTree() = default;

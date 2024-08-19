@@ -10,11 +10,6 @@ void BinarySearchTree<T>::insertNode(T data)
 {
     _insertNode(m_root, data, 0);
     std::cout << "INSERTED " << data << '\n';
-    if (m_rot1 != nullptr)
-    {
-        std::cout << "ROTATION REQUIRED: " << m_rot1->m_label << " " << m_rot2->m_label << " " << m_rot3->m_label << '\n';
-        std::cout << "ROTATION TYPE: " << m_rot1->m_bf << " " << m_rot2->m_bf << " " << m_rot3->m_bf << "\n\n";
-    }
     _rotate();
 }
 
@@ -37,26 +32,21 @@ void BinarySearchTree<T>::_insertNode(Node<T>*& node, T data, int depth)
         node->m_height = std::max(lh,rh) + 1;
         node->m_bf = lh - rh;
 
-        if (m_rot1 == nullptr)
+        if (m_ptrRot == nullptr)
         {
-            if (abs(node->m_bf)<=1)
+            if (abs(node->m_bf)>1)
             {
-                m_rot3 = m_rot2;
-                m_rot2 = node;
+                m_ptrRot = node;
             }
-            else
-                m_rot1 = node;
         }
-        else if (m_rot0 == nullptr)
-            m_rot0 = node;
+        else if (m_ptrParent == nullptr)
+            m_ptrParent = node;
     }
     else
     {
         node = new Node{data, depth};
-        m_rot0 = nullptr;
-        m_rot1 = nullptr;
-        m_rot2 = node;
-        m_rot3 = node;
+        m_ptrParent = nullptr;
+        m_ptrRot = nullptr;
     }
 }
 
@@ -179,87 +169,90 @@ bool BinarySearchTree<T>::searchNode(T data)
 template<typename T>
 void BinarySearchTree<T>::_rotate()
 {
-    if (m_rot1 != nullptr)
+    if (m_ptrRot != nullptr)
     {
-        if (m_rot1->m_bf>0 && m_rot2->m_bf>0)   // R
+        Node<T>* ptr1 = (m_ptrRot->m_bf>0) ? m_ptrRot->smaller : m_ptrRot->larger;
+        Node<T>* ptr2 = (ptr1->m_bf>0) ? ptr1->smaller : ptr1->larger;
+
+        if (m_ptrRot->m_bf>0 && ptr1->m_bf>0)   // R
         {
-            m_rot1->smaller = m_rot2->larger;
-            m_rot2->larger = m_rot1;
-            if (m_rot0 != nullptr)
+            m_ptrRot->smaller = ptr1->larger;
+            ptr1->larger = m_ptrRot;
+            if (m_ptrParent != nullptr)
             {
-                if (m_rot0->smaller == m_rot1)
+                if (m_ptrParent->smaller == m_ptrRot)
                 {
-                    m_rot0->smaller = m_rot2;
+                    m_ptrParent->smaller = ptr1;
                 }
                 else
-                    m_rot0->larger = m_rot2;
+                    m_ptrParent->larger = ptr1;
             }
             else
-                m_root = m_rot2;
+                m_root = ptr1;
 
-            _updateHeight(m_rot2);
-            _updateDepth(m_rot2, m_rot2->m_depth-1);
+            _updateHeight(ptr1);
+            _updateDepth(ptr1, ptr1->m_depth-1);
         }
-        else if (m_rot1->m_bf>0 && m_rot2->m_bf<0)  // LR
+        else if (m_ptrRot->m_bf>0 && ptr1->m_bf<0)  // LR
         {
-            m_rot1->smaller = m_rot3->larger;
-            m_rot2->larger = m_rot3->smaller;
-            m_rot3->smaller = m_rot2;
-            m_rot3->larger = m_rot1;
-            if (m_rot0 != nullptr)
+            m_ptrRot->smaller = ptr2->larger;
+            ptr1->larger = ptr2->smaller;
+            ptr2->smaller = ptr1;
+            ptr2->larger = m_ptrRot;
+            if (m_ptrParent != nullptr)
             {
-                if (m_rot0->smaller == m_rot1)
+                if (m_ptrParent->smaller == m_ptrRot)
                 {
-                    m_rot0->smaller = m_rot3;
+                    m_ptrParent->smaller = ptr2;
                 }
                 else
-                    m_rot0->larger = m_rot3;
+                    m_ptrParent->larger = ptr2;
             }
             else
-                m_root = m_rot3;
+                m_root = ptr2;
 
-            _updateHeight(m_rot3);
-            _updateDepth(m_rot3, m_rot3->m_depth-2);
+            _updateHeight(ptr2);
+            _updateDepth(ptr2, ptr2->m_depth-2);
         }
-        else if (m_rot1->m_bf<0 && m_rot2->m_bf>0)  // RL
+        else if (m_ptrRot->m_bf<0 && ptr1->m_bf>0)  // RL
         {
-            m_rot1->larger = m_rot3->smaller;
-            m_rot2->smaller = m_rot3->larger;
-            m_rot3->smaller = m_rot1;
-            m_rot3->larger = m_rot2;
-            if (m_rot0 != nullptr)
+            m_ptrRot->larger = ptr2->smaller;
+            ptr1->smaller = ptr2->larger;
+            ptr2->smaller = m_ptrRot;
+            ptr2->larger = ptr1;
+            if (m_ptrParent != nullptr)
             {
-                if (m_rot0->smaller == m_rot1)
+                if (m_ptrParent->smaller == m_ptrRot)
                 {
-                    m_rot0->smaller = m_rot3;
+                    m_ptrParent->smaller = ptr2;
                 }
                 else
-                    m_rot0->larger = m_rot3;
+                    m_ptrParent->larger = ptr2;
             }
             else
-                m_root = m_rot3;
+                m_root = ptr2;
 
-            _updateHeight(m_rot3);
-            _updateDepth(m_rot3, m_rot3->m_depth-2);
+            _updateHeight(ptr2);
+            _updateDepth(ptr2, ptr2->m_depth-2);
         }
         else    // L
         {
-            m_rot1->larger = m_rot2->smaller;
-            m_rot2->smaller = m_rot1;
-            if (m_rot0 != nullptr)
+            m_ptrRot->larger = ptr1->smaller;
+            ptr1->smaller = m_ptrRot;
+            if (m_ptrParent != nullptr)
             {
-                if (m_rot0->smaller == m_rot1)
+                if (m_ptrParent->smaller == m_ptrRot)
                 {
-                    m_rot0->smaller = m_rot2;
+                    m_ptrParent->smaller = ptr1;
                 }
                 else
-                    m_rot0->larger = m_rot2;
+                    m_ptrParent->larger = ptr1;
             }
             else
-                m_root = m_rot2;
+                m_root = ptr1;
 
-            _updateHeight(m_rot2);
-            _updateDepth(m_rot2, m_rot2->m_depth-1);
+            _updateHeight(ptr1);
+            _updateDepth(ptr1, ptr1->m_depth-1);
         }
     }
 }
