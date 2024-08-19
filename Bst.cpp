@@ -24,6 +24,7 @@ void BinarySearchTree<T>::_insertNode(Node<T>*& node, T data, int depth)
         {
             _insertNode(node->larger, data, depth+1);
         }
+
         int lh = (node->smaller == nullptr) ? -1 : node->smaller->m_height;
         int rh = (node->larger == nullptr) ? -1 : node->larger->m_height;
         node->m_height = std::max(lh,rh) + 1;
@@ -54,8 +55,8 @@ template<typename T>
 void BinarySearchTree<T>::deleteNodes(T data)
 {
     m_root = _deleteNodes(m_root, data);
-    updateHeight();
-    updateDepth();
+    // updateHeight();
+    // updateDepth();
 }
 
 template<typename T>
@@ -75,23 +76,31 @@ Node<T>* BinarySearchTree<T>::_deleteNodes(Node<T>* node, T data)
                 Node<T>* ptr{ node };
                 node = node->smaller;
                 delete ptr;
+                _updateDepth(node, node->m_depth-1);
             }
             else if (node->smaller == nullptr && node->larger != nullptr)
             {
                 Node<T>* ptr{ node };
                 node = node->larger;
                 delete ptr;
+                _updateDepth(node, node->m_depth-1);
             }
             else
             {
                 node->setData(node->smaller->findMax()); // no duplicates guaranteed in smaller subtree
                 node->smaller = _deleteNodes(node->smaller, node->m_data);
+                // no change in depth
             }
         }
         if (node != nullptr)    // for leaf case
         {
             node->smaller = _deleteNodes(node->smaller, data);
             node->larger = _deleteNodes(node->larger, data);
+
+            int lh = (node->smaller == nullptr) ? -1 : node->smaller->m_height;
+            int rh = (node->larger == nullptr) ? -1 : node->larger->m_height;
+            node->m_height = std::max(lh,rh) + 1;
+            node->m_bf = lh - rh;
         }
 
         return node;
