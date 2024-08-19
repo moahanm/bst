@@ -91,6 +91,7 @@ private:
     Node<T>* m_rot0{nullptr};
     Node<T>* m_rot1{nullptr};
     Node<T>* m_rot2{nullptr};
+    Node<T>* m_rot3{nullptr};
 
 public:
     BinarySearchTree() = default;
@@ -115,8 +116,9 @@ private:
     void _insertNode(Node<T>*& node, T data, int depth);
     Node<T>* _deleteNodes(Node<T>* node, T data);
     void _deleteTree(Node<T>*& node);
-    void _updateHeight(Node<T>*& node);
-    void _updateDepth(Node<T>*& node, int depth);
+    void _rotate();
+    void _updateHeight(Node<T>* node);
+    void _updateDepth(Node<T>* node, int depth);
     void _printNode(Node<T>*& node, int x, int y);
 
 };

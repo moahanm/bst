@@ -21,6 +21,7 @@ int main()
     bst.insertNode(7);
     bst.insertNode(5);
 
+
     std::cout << "BEFORE:\n";
     bst.printTree();
 
