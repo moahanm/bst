@@ -1,10 +1,15 @@
 #include "Bst.h" // dummy
 #include <cmath>
-#include <iomanip>
 #include <iostream>
 #include <string>
 #include <vector>
 
+
+template<typename T>
+void BinarySearchTree<T>::insertNode(T data)
+{
+    _insertNode(m_root, data, 0);
+}
 
 template<typename T>
 void BinarySearchTree<T>::_insertNode(Node<T>*& node, T data, int depth)
@@ -16,13 +21,32 @@ void BinarySearchTree<T>::_insertNode(Node<T>*& node, T data, int depth)
             _insertNode(node->smaller, data, depth+1);
         }
         else
-            _insertNode(node->larger, data, depth+1);        
+        {
+            _insertNode(node->larger, data, depth+1);
+        }
+        int lh = (node->smaller == nullptr) ? -1 : node->smaller->m_height;
+        int rh = (node->larger == nullptr) ? -1 : node->larger->m_height;
+        node->m_height = std::max(lh,rh) + 1;
+        node->m_bf = lh - rh;
+
+        if (m_rot0 == nullptr)
+        {
+            if (abs(node->m_bf)<=1)
+            {
+                m_rot2 = m_rot1;
+                m_rot1 = node;
+            }
+            else
+                m_rot0 = node;
+        }
     }
     else
     {
         node = new Node{data, depth};
+        m_rot0 = nullptr;
+        m_rot1 = node;
+        m_rot2 = node;
     }
-    updateHeight();
 }
 
 // Delete all nodes with data 'data'
@@ -39,7 +63,7 @@ Node<T>* BinarySearchTree<T>::_deleteNodes(Node<T>* node, T data)
 {
     if (node != nullptr)
     {
-        if (node->m_data == data)
+        if (node->isEqual(data))
         {
             if (node->m_height == 0)
             {
@@ -60,7 +84,7 @@ Node<T>* BinarySearchTree<T>::_deleteNodes(Node<T>* node, T data)
             }
             else
             {
-                node->m_data = node->smaller->findMax(); // no duplicates guaranteed in smaller subtree
+                node->setData(node->smaller->findMax()); // no duplicates guaranteed in smaller subtree
                 node->smaller = _deleteNodes(node->smaller, node->m_data);
             }
         }
@@ -129,20 +153,7 @@ bool BinarySearchTree<T>::searchNode(T data)
 template<typename T>
 void BinarySearchTree<T>::updateHeight()
 {
-    _resetHeight(m_root);
     _updateHeight(m_root);
-}
-
-// Reset height values for all nodes with root 'node' inclusive
-template<typename T>
-void BinarySearchTree<T>::_resetHeight(Node<T>*& node)
-{
-    if (node != nullptr)
-    {
-        node->m_height = 0;
-        _resetHeight(node->smaller);
-        _resetHeight(node->larger);
-    }
 }
 
 // Update height values for all nodes with root 'node' inclusive
@@ -157,17 +168,23 @@ void BinarySearchTree<T>::_updateHeight(Node<T>*& node)
         if (node->smaller == nullptr && node->larger == nullptr)    // leaf
         {
             node->m_height = 0;
+            node->m_bf = 0;
         }
         else if (node->smaller == nullptr && node->larger != nullptr)
         {
             node->m_height = node->larger->m_height + 1;
+            node->m_bf = -1 - node->larger->m_height;
         }
         else if (node->smaller != nullptr && node->larger == nullptr)
         {
             node->m_height = node->smaller->m_height + 1;
+            node->m_bf = node->smaller->m_height + 1;
         }
         else
+        {
             node->m_height = std::max(node->smaller->m_height,node->larger->m_height) + 1;
+            node->m_bf = node->smaller->m_height - node->larger->m_height;
+        }
     }
 }
 
@@ -223,12 +240,8 @@ void BinarySearchTree<T>::_printNode(Node<T>*& node, int x, int y)
     if (node != nullptr)
     {
         std::string& line{ m_lines[y] };
-        std::stringstream os{};
-        os << std::setfill('0') << std::setw(PRINTSPACE) << node->m_data;
-        std::string label{};
-        os >> label;
         for (int i{0}; i<PRINTSPACE; i++)
-            line[x*PRINTSPACE+i] = label[i];
+            line[x*PRINTSPACE+i] = node->m_label[i];
 
         int H{m_root->m_height};
         int d{node->m_depth};

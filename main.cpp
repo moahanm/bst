@@ -8,7 +8,7 @@
 int main()
 {
     const int nNodes = 10;
-    BinarySearchTree<double> bst{};
+    BinarySearchTree<int> bst{};
 
     // for (int i{0}; i<nNodes; i++)
     //     bst.insertNode(Random::get(0,10*nNodes));
