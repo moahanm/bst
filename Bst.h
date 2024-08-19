@@ -47,9 +47,19 @@ private:
         return m_data == data;
     };
 
-    bool isEqual(const Node node)
+    bool isEqual(const Node& node)
     {
         return m_data == node.m_data;
+    };
+
+    bool isLessThan(const T data)
+    {
+        return m_data < data;
+    };
+
+    bool isLessThan(const Node& node)
+    {
+        return m_data < node.m_data;
     };
 
     T findMin()
@@ -84,17 +94,23 @@ template<typename T>
 class BinarySearchTree
 {
 private:
-    Node<T>* m_root{nullptr};
+    Node<T>* m_root{ nullptr };
+    bool m_isBalanced{ true };
     std::vector<std::string> m_lines;
 
     // for rotation
-    Node<T>* m_ptrParent{nullptr};
-    Node<T>* m_ptrRot{nullptr};
+    Node<T>* m_ptrParent{ nullptr };
+    Node<T>* m_ptrRot{ nullptr };
 
 public:
     BinarySearchTree() = default;
 
-    BinarySearchTree(std::vector<T> list)
+    BinarySearchTree(bool isBalanced)
+    {
+        m_isBalanced = isBalanced;
+    }
+
+    BinarySearchTree(std::vector<T> list)   // always balanced, for now
     {
         for (auto& ele : list)
             insertNode(ele);
@@ -102,7 +118,7 @@ public:
 
     void insertNode(T data);
     void deleteNodes(T data);
-    bool searchNode(T data);
+    std::size_t findNodes(T data);
     void updateHeight();
     void updateDepth(){ _updateDepth(m_root, 0); };
     int getHeight(){ return m_root->m_height; };
@@ -112,6 +128,7 @@ public:
 
 private:
     void _insertNode(Node<T>*& node, T data, int depth);
+    Node<T>* _deleteNode(Node<T>* node, T data);
     Node<T>* _deleteNodes(Node<T>* node, T data);
     void _deleteTree(Node<T>*& node);
     void _rotate();

@@ -23,9 +23,7 @@ void BinarySearchTree<T>::_insertNode(Node<T>*& node, T data, int depth)
             _insertNode(node->smaller, data, depth+1);
         }
         else
-        {
             _insertNode(node->larger, data, depth+1);
-        }
 
         int lh = (node->smaller == nullptr) ? -1 : node->smaller->m_height;
         int rh = (node->larger == nullptr) ? -1 : node->larger->m_height;
@@ -54,9 +52,76 @@ void BinarySearchTree<T>::_insertNode(Node<T>*& node, T data, int depth)
 template<typename T>
 void BinarySearchTree<T>::deleteNodes(T data)
 {
-    m_root = _deleteNodes(m_root, data);
-    // updateHeight();
-    // updateDepth();
+    if (m_isBalanced)
+    {
+        std::size_t count{ findNodes(data) };
+        for (std::size_t i{0}; i<count; i++)
+        {
+            m_root = _deleteNode(m_root, data);
+            // _rotate();
+        }
+    }
+    else
+        m_root = _deleteNodes(m_root, data);
+}
+
+template<typename T>
+Node<T>* BinarySearchTree<T>::_deleteNode(Node<T>* node, T data)
+{
+    if (node != nullptr)
+    {
+        if (node->isEqual(data))
+        {
+            if (node->m_height == 0)
+            {
+                delete node;
+                node = nullptr;
+            }
+            else if (node->smaller != nullptr && node->larger == nullptr)
+            {
+                Node<T>* ptr{ node };
+                node = node->smaller;
+                delete ptr;
+                if (node != nullptr)
+                    _updateDepth(node, node->m_depth-1);
+            }
+            else if (node->smaller == nullptr && node->larger != nullptr)
+            {
+
+                Node<T>* ptr{ node };
+                node = node->larger;
+                delete ptr;
+                if (node != nullptr)
+                    _updateDepth(node, node->m_depth-1);
+            }
+            else
+            {
+                node->setData(node->smaller->findMax()); // no duplicates guaranteed in smaller subtree
+                node->smaller = _deleteNode(node->smaller, node->m_data);
+                // no change in depth
+            }
+        }
+        else if (node->isLessThan(data))
+        {
+            node->larger = _deleteNode(node->larger, data);
+        }
+        else
+        {
+            node->smaller = _deleteNode(node->smaller, data);
+        }
+
+        if (node != nullptr)
+        {
+            int lh = (node->smaller == nullptr) ? -1 : node->smaller->m_height;
+            int rh = (node->larger == nullptr) ? -1 : node->larger->m_height;
+            node->m_height = std::max(lh,rh) + 1;
+            node->m_bf = lh - rh;
+        }
+
+        return node;
+    }
+    else
+        return nullptr;
 }
 
 template<typename T>
@@ -76,7 +141,8 @@ Node<T>* BinarySearchTree<T>::_deleteNodes(Node<T>* node, T data)
                 Node<T>* ptr{ node };
                 node = node->smaller;
                 delete ptr;
-                _updateDepth(node, node->m_depth-1);
+                if (node != nullptr)
+                    _updateDepth(node, node->m_depth-1);
             }
             else if (node->smaller == nullptr && node->larger != nullptr)
             {
@@ -95,10 +161,11 @@ Node<T>* BinarySearchTree<T>::_deleteNodes(Node<T>* node, T data)
             else
             {
                 node->setData(node->smaller->findMax()); // no duplicates guaranteed in smaller subtree
-                node->smaller = _deleteNodes(node->smaller, node->m_data);
+                node->smaller = _deleteNode(node->smaller, node->m_data);
                 // no change in depth
             }
         }
+
         if (node != nullptr)
         {
             node->smaller = _deleteNodes(node->smaller, data);
@@ -129,41 +196,48 @@ void BinarySearchTree<T>::_deleteTree(Node<T>*& node)
 }
 
 template<typename T>
-bool BinarySearchTree<T>::searchNode(T data)
+std::size_t BinarySearchTree<T>::findNodes(T data)
 {
+    std::size_t ans{0};
+
     if (m_root != nullptr)
     {
         Node<T>* node{ m_root };
 
         while (true)
         {
-            if (data == node->m_data)
+            if (node->isEqual(data))
             {
-                return true;
-            }
-            else if (data < node->m_data)
-            {
-                if (node->smaller != nullptr)
+                ans++;
+                if (node->larger != nullptr)
                 {
-                    node = node->smaller;
+                    node = node->larger;    // duplicates may exist in larger subtree
                 }
                 else
-                    return false;
-            
+                    return ans;
             }
-            else if (data > node->m_data)
+            else if (node->isLessThan(data))
             {
                 if (node->larger != nullptr)
                 {
                     node = node->larger;
                 }
                 else
-                    return false;
+                    return ans;
+            }
+            else
+            {
+                if (node->smaller != nullptr)
+                {
+                    node = node->smaller;
+                }
+                else
+                    return ans;
             }
         }
     }
     else
-        return false;
+        return 0;
 }
 
 template<typename T>

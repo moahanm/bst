@@ -21,13 +21,14 @@ int main()
     bst.insertNode(7);
     bst.insertNode(5);
 
+    std::cout << "NUMBER OF 5s: " << bst.findNodes(5) << '\n';
 
     std::cout << "BEFORE:\n";
     bst.printTree();
 
     bst.deleteNodes(5);
 
-    std::cout << "AFTER deleting 5:\n";
+    std::cout << "AFTER deleting 6:\n";
     bst.printTree();
 
     return 0;
