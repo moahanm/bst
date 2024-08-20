@@ -20,6 +20,16 @@ int main()
     bst.insertNode(6);
     bst.insertNode(7);
     bst.insertNode(5);
+    bst.insertNode(4);
+
+    // for delete rotation
+    // bst.insertNode(0);
+    // bst.insertNode(-4);
+    // bst.insertNode(4);
+    // bst.insertNode(-6);
+    // bst.insertNode(-3);
+    // bst.insertNode(6);
+    // bst.insertNode(-8);
 
     std::cout << "NUMBER OF 5s: " << bst.findNodes(5) << '\n';
 
@@ -28,7 +38,7 @@ int main()
 
     bst.deleteNodes(5);
 
-    std::cout << "AFTER deleting 6:\n";
+    std::cout << "AFTER deleting 5:\n";
     bst.printTree();
 
     return 0;

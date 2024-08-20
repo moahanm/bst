@@ -9,7 +9,7 @@ template<typename T>
 void BinarySearchTree<T>::insertNode(T data)
 {
     _insertNode(m_root, data, 0);
-    std::cout << "INSERTED " << data << '\n';
+    // std::cout << "INSERTED " << data << '\n';
     _rotate();
 }
 
@@ -33,19 +33,13 @@ void BinarySearchTree<T>::_insertNode(Node<T>*& node, T data, int depth)
         if (m_ptrRot == nullptr)
         {
             if (abs(node->m_bf)>1)
-            {
                 m_ptrRot = node;
-            }
         }
         else if (m_ptrParent == nullptr)
             m_ptrParent = node;
     }
     else
-    {
         node = new Node{data, depth};
-        m_ptrParent = nullptr;
-        m_ptrRot = nullptr;
-    }
 }
 
 // Delete all nodes with data 'data'
@@ -58,7 +52,7 @@ void BinarySearchTree<T>::deleteNodes(T data)
         for (std::size_t i{0}; i<count; i++)
         {
             m_root = _deleteNode(m_root, data);
-            // _rotate();
+            _rotate();
         }
     }
     else
@@ -116,6 +110,14 @@ Node<T>* BinarySearchTree<T>::_deleteNode(Node<T>* node, T data)
             int rh = (node->larger == nullptr) ? -1 : node->larger->m_height;
             node->m_height = std::max(lh,rh) + 1;
             node->m_bf = lh - rh;
+
+            if (m_ptrRot == nullptr)
+            {
+                if (abs(node->m_bf)>1)
+                    m_ptrRot = node;
+            }
+            else if (m_ptrParent == nullptr)
+                m_ptrParent = node;
         }
 
         return node;
@@ -245,6 +247,7 @@ void BinarySearchTree<T>::_rotate()
 {
     if (m_ptrRot != nullptr)
     {
+        // std::cout << "ROTATING AT PIVOT " << m_ptrRot->m_label << '\n';
         Node<T>* ptr1 = (m_ptrRot->m_bf>0) ? m_ptrRot->smaller : m_ptrRot->larger;
         Node<T>* ptr2 = (ptr1->m_bf>0) ? ptr1->smaller : ptr1->larger;
 
@@ -329,6 +332,8 @@ void BinarySearchTree<T>::_rotate()
             _updateDepth(ptr1, ptr1->m_depth-1);
         }
     }
+    m_ptrParent = nullptr;
+    m_ptrRot = nullptr;
 }
 
 template<typename T>
