@@ -40,7 +40,7 @@ void BinarySearchTree<T>::_insertNode(Node<T>*& node, const T data, int depth)
 
         if (m_ptrRot == nullptr)
         {
-            if (abs(node->m_bf)>1)
+            if (_isUnbalanced(node))
                 m_ptrRot = node;
         }
         else if (m_ptrParent == nullptr)
@@ -54,7 +54,7 @@ void BinarySearchTree<T>::_insertNode(Node<T>*& node, const T data, int depth)
 template<typename T>
 void BinarySearchTree<T>::deleteNodes(T data)
 {
-    if (m_isBalanced)
+    if (m_balanceOrder>0)
     {
         std::size_t count{ findNodes(data) };
         for (std::size_t i{0}; i<count; i++)
@@ -84,7 +84,7 @@ Node<T>* BinarySearchTree<T>::_deleteNode(Node<T>* node, T data)
                 Node<T>* ptr{ node };
                 node = node->smaller;
                 delete ptr;
-                if (node != nullptr)
+                if (node != nullptr && m_debug)
                     _updateDepth(node, node->m_depth-1);
             }
             else if (node->smaller == nullptr && node->larger != nullptr)
@@ -93,7 +93,7 @@ Node<T>* BinarySearchTree<T>::_deleteNode(Node<T>* node, T data)
                 Node<T>* ptr{ node };
                 node = node->larger;
                 delete ptr;
-                if (node != nullptr)
+                if (node != nullptr && m_debug)
                     _updateDepth(node, node->m_depth-1);
             }
             else
@@ -118,7 +118,7 @@ Node<T>* BinarySearchTree<T>::_deleteNode(Node<T>* node, T data)
 
             if (m_ptrRot == nullptr)
             {
-                if (abs(node->m_bf)>1)
+                if (_isUnbalanced(node))
                     m_ptrRot = node;
             }
             else if (m_ptrParent == nullptr)
@@ -148,7 +148,7 @@ Node<T>* BinarySearchTree<T>::_deleteNodes(Node<T>* node, T data)
                 Node<T>* ptr{ node };
                 node = node->smaller;
                 delete ptr;
-                if (node != nullptr)
+                if (node != nullptr && m_debug)
                     _updateDepth(node, node->m_depth-1);
             }
             else if (node->smaller == nullptr && node->larger != nullptr)
@@ -162,7 +162,7 @@ Node<T>* BinarySearchTree<T>::_deleteNodes(Node<T>* node, T data)
                     delete ptr;
                     d++;
                 }
-                if (node != nullptr)
+                if (node != nullptr && m_debug)
                     _updateDepth(node, node->m_depth-d);
             }
             else
@@ -277,7 +277,8 @@ void BinarySearchTree<T>::_rotate()
             else
                 m_root = ptr1;
 
-            _updateDepth(ptr1, ptr1->m_depth-1);
+            if (m_debug)
+                _updateDepth(ptr1, ptr1->m_depth-1);
         }
         else if (m_ptrRot->m_bf>0 && ptr1->m_bf<0)  // LR
         {
@@ -308,7 +309,8 @@ void BinarySearchTree<T>::_rotate()
             else
                 m_root = ptr2;
 
-            _updateDepth(ptr2, ptr2->m_depth-2);
+            if (m_debug)
+                _updateDepth(ptr2, ptr2->m_depth-2);
         }
         else if (m_ptrRot->m_bf<0 && ptr1->m_bf>0)  // RL
         {
@@ -339,7 +341,8 @@ void BinarySearchTree<T>::_rotate()
             else
                 m_root = ptr2;
 
-            _updateDepth(ptr2, ptr2->m_depth-2);
+            if (m_debug)
+                _updateDepth(ptr2, ptr2->m_depth-2);
         }
         else    // L
         {
@@ -365,7 +368,8 @@ void BinarySearchTree<T>::_rotate()
             else
                 m_root = ptr1;
 
-            _updateDepth(ptr1, ptr1->m_depth-1);
+            if (m_debug)
+                _updateDepth(ptr1, ptr1->m_depth-1);
         }
 
         _updateNodeHeight(m_ptrParent);
@@ -430,6 +434,9 @@ void BinarySearchTree<T>::printTree()
 {
     if (m_root != nullptr)
     {
+        if (!m_debug)
+            _updateDepth(m_root, 0);
+
         int nlines{ m_root->m_height + 1 };
         int pWidth{2};
         for (int i{0}; i<nlines-1; i++)

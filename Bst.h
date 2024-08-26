@@ -95,7 +95,7 @@ class BinarySearchTree
 {
 private:
     Node<T>* m_root{ nullptr };
-    bool m_isBalanced{ true };
+    int m_balanceOrder{ 1 };
     bool m_debug{ false };
     std::vector<std::string> m_lines;
 
@@ -106,12 +106,12 @@ private:
 public:
     BinarySearchTree() = default;
 
-    BinarySearchTree(bool isBalanced)
+    BinarySearchTree(int balanceOrder)
     {
-        m_isBalanced = isBalanced;
+        m_balanceOrder = balanceOrder;
     }
 
-    BinarySearchTree(bool isBalanced, const std::vector<T> list)   // always balanced, for now
+    BinarySearchTree(int balanceOrder, const std::vector<T> list)   // always balanced, for now
     {
         for (auto& ele : list)
             insertNode(ele);
@@ -119,7 +119,7 @@ public:
 
     BinarySearchTree(BinarySearchTree& bst) // copy constructor
     {
-        BinarySearchTree(bst.m_isBalanced, bst._getSeqence());
+        BinarySearchTree(bst.m_balanceOrder, bst._getSeqence());
     }
 
     void insertNode(const T data);
@@ -127,7 +127,6 @@ public:
     void deleteNodes(const T data);
     std::size_t findNodes(T data);
     void updateHeight();
-    void updateDepth(){ _updateDepth(m_root, 0); };
     int getHeight(){ return m_root->m_height; };
     void setDebug(bool state){ m_debug = state; };
     void printTree();
@@ -139,6 +138,7 @@ private:
     Node<T>* _deleteNode(Node<T>* node, T data);
     Node<T>* _deleteNodes(Node<T>* node, T data);
     void _deleteTree(Node<T>*& node);
+    bool _isUnbalanced(Node<T>* node){ return abs(node->m_bf)>=(2*m_balanceOrder); };
     void _rotate();
     int _getNodeHeight(Node<T>* node){ return (node == nullptr) ? -1 : node->m_height; };
     void _updateNodeHeight(Node<T>* node);
