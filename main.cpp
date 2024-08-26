@@ -8,24 +8,25 @@
 int main()
 {
     const int nNodes = 10;
-    BinarySearchTree<int> bst{};
+    BinarySearchTree<int> bst{true};
 
     // for (int i{0}; i<nNodes; i++)
     //     bst.insertNode(Random::get(0,10*nNodes));
 
-    // bst.insertNode({40,20,10,25,30,22,50});    
+    bst.insertNode({40,20,10,25,30,22,50});
+    bst.printTree();
 
-    bst.insertNode(2);
-    bst.insertNode(5);
-    bst.insertNode(1);
-    bst.insertNode(4);
-    bst.insertNode(5);
-    bst.insertNode(6);
-    bst.insertNode(7);
-    bst.insertNode(5);
-    bst.insertNode(4);
-    bst.insertNode(3);
-    bst.insertNode(3);
+    // bst.insertNode(2);
+    // bst.insertNode(5);
+    // bst.insertNode(1);
+    // bst.insertNode(4);
+    // bst.insertNode(5);
+    // bst.insertNode(6);
+    // bst.insertNode(7);
+    // bst.insertNode(5);
+    // bst.insertNode(4);
+    // bst.insertNode(3);
+    // bst.insertNode(3);
 
 
     // for delete rotation
@@ -37,15 +38,15 @@ int main()
     // bst.insertNode(6);
     // bst.insertNode(-8);
 
-    std::cout << "NUMBER OF 5s: " << bst.findNodes(5) << '\n';
+    // std::cout << "NUMBER OF 5s: " << bst.findNodes(5) << '\n';
 
-    std::cout << "BEFORE:\n";
-    bst.printTree();
+    // // std::cout << "BEFORE:\n";
+    // bst.printTree();
 
-    bst.deleteNodes(5);
+    // bst.deleteNodes(5);
 
-    std::cout << "AFTER deleting 5:\n";
-    bst.printTree();
+    // std::cout << "AFTER deleting 5:\n";
+    // bst.printTree();
 
     return 0;
 }

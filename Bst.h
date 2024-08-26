@@ -94,6 +94,13 @@ template<typename T>
 class BinarySearchTree
 {
 private:
+
+    enum SenseType
+    {
+        left,
+        right
+    };
+
     Node<T>* m_root{ nullptr };
     int m_balanceOrder{ 1 };
     bool m_debug{ false };
@@ -101,17 +108,19 @@ private:
 
     // for rotation
     Node<T>* m_ptrParent{ nullptr };
-    Node<T>* m_ptrRot{ nullptr };
+    Node<T>* m_ptrRotHead{ nullptr };
+    std::vector<Node<T>*> m_ptrRots{};
 
 public:
-    BinarySearchTree() = default;
-
-    BinarySearchTree(int balanceOrder)
+    BinarySearchTree(bool debug=false): m_debug{debug}
     {
-        m_balanceOrder = balanceOrder;
     }
 
-    BinarySearchTree(int balanceOrder, const std::vector<T> list)   // always balanced, for now
+    BinarySearchTree(int balanceOrder, bool debug=false): m_balanceOrder{balanceOrder}, m_debug{debug}
+    {
+    }
+
+    BinarySearchTree(int balanceOrder, const std::vector<T> list, bool debug=false): m_balanceOrder{balanceOrder}, m_debug{debug}
     {
         for (auto& ele : list)
             insertNode(ele);
@@ -119,7 +128,7 @@ public:
 
     BinarySearchTree(BinarySearchTree& bst) // copy constructor
     {
-        BinarySearchTree(bst.m_balanceOrder, bst._getSeqence());
+        BinarySearchTree(bst.m_balanceOrder, bst._getSeqence(), bst.m_debug);
     }
 
     void insertNode(const T data);
@@ -128,7 +137,6 @@ public:
     std::size_t findNodes(T data);
     void updateHeight();
     int getHeight(){ return m_root->m_height; };
-    void setDebug(bool state){ m_debug = state; };
     void printTree();
 
     ~BinarySearchTree(){ _deleteTree(m_root); }
@@ -139,7 +147,10 @@ private:
     Node<T>* _deleteNodes(Node<T>* node, T data);
     void _deleteTree(Node<T>*& node);
     bool _isUnbalanced(Node<T>* node){ return abs(node->m_bf)>=(2*m_balanceOrder); };
+    void _fillRotationPointers();
     void _rotate();
+    void __rotate();
+    void _rotate1(Node<T>* parentNode, Node<T>* node, SenseType sense);
     int _getNodeHeight(Node<T>* node){ return (node == nullptr) ? -1 : node->m_height; };
     void _updateNodeHeight(Node<T>* node);
     void _setNodeHeight(Node<T>* node, int heightL, int heightR);
