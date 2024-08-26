@@ -96,6 +96,7 @@ class BinarySearchTree
 private:
     Node<T>* m_root{ nullptr };
     bool m_isBalanced{ true };
+    bool m_debug{ false };
     std::vector<std::string> m_lines;
 
     // for rotation
@@ -121,18 +122,20 @@ public:
         BinarySearchTree(bst.m_isBalanced, bst._getSeqence());
     }
 
-    void insertNode(T data);
-    void deleteNodes(T data);
+    void insertNode(const T data);
+    void insertNode(const std::vector<T> list);
+    void deleteNodes(const T data);
     std::size_t findNodes(T data);
     void updateHeight();
     void updateDepth(){ _updateDepth(m_root, 0); };
     int getHeight(){ return m_root->m_height; };
+    void setDebug(bool state){ m_debug = state; };
     void printTree();
 
     ~BinarySearchTree(){ _deleteTree(m_root); }
 
 private:
-    void _insertNode(Node<T>*& node, T data, int depth);
+    void _insertNode(Node<T>*& node, const T data, int depth);
     Node<T>* _deleteNode(Node<T>* node, T data);
     Node<T>* _deleteNodes(Node<T>* node, T data);
     void _deleteTree(Node<T>*& node);

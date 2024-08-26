@@ -12,6 +12,9 @@ int main()
 
     // for (int i{0}; i<nNodes; i++)
     //     bst.insertNode(Random::get(0,10*nNodes));
+
+    // bst.insertNode({40,20,10,25,30,22,50});    
+
     bst.insertNode(2);
     bst.insertNode(5);
     bst.insertNode(1);

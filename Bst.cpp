@@ -6,7 +6,7 @@
 
 
 template<typename T>
-void BinarySearchTree<T>::insertNode(T data)
+void BinarySearchTree<T>::insertNode(const T data)
 {
     _insertNode(m_root, data, 0);
     // std::cout << "INSERTED " << data << '\n';
@@ -14,7 +14,15 @@ void BinarySearchTree<T>::insertNode(T data)
 }
 
 template<typename T>
-void BinarySearchTree<T>::_insertNode(Node<T>*& node, T data, int depth)
+void BinarySearchTree<T>::insertNode(const std::vector<T> list)
+{
+    for (const auto& ele : list)
+        insertNode(ele);
+}
+
+
+template<typename T>
+void BinarySearchTree<T>::_insertNode(Node<T>*& node, const T data, int depth)
 {
     if (node != nullptr)
     {
@@ -106,10 +114,7 @@ Node<T>* BinarySearchTree<T>::_deleteNode(Node<T>* node, T data)
 
         if (node != nullptr)
         {
-            int lh = (node->smaller == nullptr) ? -1 : node->smaller->m_height;
-            int rh = (node->larger == nullptr) ? -1 : node->larger->m_height;
-            node->m_height = std::max(lh,rh) + 1;
-            node->m_bf = lh - rh;
+            _updateNodeHeight(node);
 
             if (m_ptrRot == nullptr)
             {
@@ -173,10 +178,7 @@ Node<T>* BinarySearchTree<T>::_deleteNodes(Node<T>* node, T data)
             node->smaller = _deleteNodes(node->smaller, data);
             node->larger = _deleteNodes(node->larger, data);
 
-            int lh = (node->smaller == nullptr) ? -1 : node->smaller->m_height;
-            int rh = (node->larger == nullptr) ? -1 : node->larger->m_height;
-            node->m_height = std::max(lh,rh) + 1;
-            node->m_bf = lh - rh;
+            _updateNodeHeight(node);
         }
 
         return node;
