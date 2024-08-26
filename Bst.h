@@ -138,6 +138,8 @@ private:
     void _deleteTree(Node<T>*& node);
     void _rotate();
     int _getNodeHeight(Node<T>* node){ return (node == nullptr) ? -1 : node->m_height; };
+    void _updateNodeHeight(Node<T>* node);
+    void _setNodeHeight(Node<T>* node, int heightL, int heightR);
     void _updateHeight(Node<T>* node);
     void _updateDepth(Node<T>* node, int depth);
     std::vector<T> _getSequence(){ return {0}; };  // TODO: for deep copying
