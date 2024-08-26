@@ -110,10 +110,15 @@ public:
         m_isBalanced = isBalanced;
     }
 
-    BinarySearchTree(std::vector<T> list)   // always balanced, for now
+    BinarySearchTree(bool isBalanced, const std::vector<T> list)   // always balanced, for now
     {
         for (auto& ele : list)
             insertNode(ele);
+    }
+
+    BinarySearchTree(BinarySearchTree& bst) // copy constructor
+    {
+        BinarySearchTree(bst.m_isBalanced, bst._getSeqence());
     }
 
     void insertNode(T data);
@@ -132,8 +137,10 @@ private:
     Node<T>* _deleteNodes(Node<T>* node, T data);
     void _deleteTree(Node<T>*& node);
     void _rotate();
+    int _getNodeHeight(Node<T>* node){ return (node == nullptr) ? -1 : node->m_height; };
     void _updateHeight(Node<T>* node);
     void _updateDepth(Node<T>* node, int depth);
+    std::vector<T> _getSequence(){ return {0}; };  // TODO: for deep copying
     void _printNode(Node<T>*& node, int x, int y);
 
 };

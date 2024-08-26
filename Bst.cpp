@@ -253,8 +253,16 @@ void BinarySearchTree<T>::_rotate()
 
         if (m_ptrRot->m_bf>0 && ptr1->m_bf>0)   // R
         {
+            std::cout << "ROTATE R\n";
+            int hPtrRotR = _getNodeHeight(m_ptrRot->larger);
+            int hPtr1R = _getNodeHeight(ptr1->larger);
+
             m_ptrRot->smaller = ptr1->larger;
             ptr1->larger = m_ptrRot;
+
+            m_ptrRot->m_height = std::max(hPtr1R,hPtrRotR) + 1;
+            ptr1->m_height = std::max(ptr2->m_height,m_ptrRot->m_height) + 1;
+
             if (m_ptrParent != nullptr)
             {
                 if (m_ptrParent->smaller == m_ptrRot)
@@ -267,15 +275,25 @@ void BinarySearchTree<T>::_rotate()
             else
                 m_root = ptr1;
 
-            _updateHeight(ptr1);
             _updateDepth(ptr1, ptr1->m_depth-1);
         }
         else if (m_ptrRot->m_bf>0 && ptr1->m_bf<0)  // LR
         {
+            std::cout << "ROTATE LR\n";
+            int hPtrRotR =_getNodeHeight(m_ptrRot->larger);
+            int hPtr1L = _getNodeHeight(ptr1->smaller);
+            int hPtr2L = _getNodeHeight(ptr2->smaller);
+            int hPtr2R = _getNodeHeight(ptr2->larger);
+
             m_ptrRot->smaller = ptr2->larger;
             ptr1->larger = ptr2->smaller;
             ptr2->smaller = ptr1;
             ptr2->larger = m_ptrRot;
+
+            ptr1->m_height = std::max(hPtr1L,hPtr2L) + 1;
+            m_ptrRot->m_height = std::max(hPtr2R,hPtrRotR) + 1;
+            ptr2->m_height = std::max(ptr1->m_height,m_ptrRot->m_height) + 1;
+
             if (m_ptrParent != nullptr)
             {
                 if (m_ptrParent->smaller == m_ptrRot)
@@ -288,15 +306,25 @@ void BinarySearchTree<T>::_rotate()
             else
                 m_root = ptr2;
 
-            _updateHeight(ptr2);
             _updateDepth(ptr2, ptr2->m_depth-2);
         }
         else if (m_ptrRot->m_bf<0 && ptr1->m_bf>0)  // RL
         {
+            std::cout << "ROTATE RL\n";
+            int hPtrRotL = _getNodeHeight(m_ptrRot->larger);
+            int hPtr1R = _getNodeHeight(ptr1->larger);
+            int hPtr2L = _getNodeHeight(ptr2->smaller);
+            int hPtr2R = _getNodeHeight(ptr2->larger);
+
             m_ptrRot->larger = ptr2->smaller;
             ptr1->smaller = ptr2->larger;
             ptr2->smaller = m_ptrRot;
             ptr2->larger = ptr1;
+
+            m_ptrRot->m_height = std::max(hPtrRotL,hPtr2L) + 1;
+            ptr1->m_height = std::max(hPtr2R,hPtr1R) + 1;
+            ptr2->m_height = std::max(m_ptrRot->m_height,ptr1->m_height) + 1;
+
             if (m_ptrParent != nullptr)
             {
                 if (m_ptrParent->smaller == m_ptrRot)
@@ -309,13 +337,20 @@ void BinarySearchTree<T>::_rotate()
             else
                 m_root = ptr2;
 
-            _updateHeight(ptr2);
             _updateDepth(ptr2, ptr2->m_depth-2);
         }
         else    // L
         {
+            std::cout << "ROTATE L\n";
+            int hPtrRotL = _getNodeHeight(m_ptrRot->smaller);
+            int hPtr1L = _getNodeHeight(ptr1->smaller);
+
             m_ptrRot->larger = ptr1->smaller;
             ptr1->smaller = m_ptrRot;
+
+            m_ptrRot->m_height = std::max(hPtrRotL,hPtr1L) + 1;
+            ptr1->m_height = std::max(m_ptrRot->m_height,ptr2->m_height) + 1;
+
             if (m_ptrParent != nullptr)
             {
                 if (m_ptrParent->smaller == m_ptrRot)
@@ -328,7 +363,6 @@ void BinarySearchTree<T>::_rotate()
             else
                 m_root = ptr1;
 
-            _updateHeight(ptr1);
             _updateDepth(ptr1, ptr1->m_depth-1);
         }
     }
