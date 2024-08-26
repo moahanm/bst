@@ -19,7 +19,6 @@ private:
     Node* larger{ nullptr };
     int m_height{0};
     int m_depth{0};
-    int m_bf{0};
     std::string m_label{""};
 
     Node(T data, int depth): m_data{data}, m_depth{depth}
@@ -146,12 +145,13 @@ private:
     Node<T>* _deleteNode(Node<T>* node, T data);
     Node<T>* _deleteNodes(Node<T>* node, T data);
     void _deleteTree(Node<T>*& node);
-    bool _isUnbalanced(Node<T>* node){ return abs(node->m_bf)>=(2*m_balanceOrder); };
+    bool _isUnbalanced(Node<T>* node);
     void _fillRotationPointers();
     void _rotate();
     void __rotate();
     void _rotate1(Node<T>* parentNode, Node<T>* node, SenseType sense);
     int _getNodeHeight(Node<T>* node){ return (node == nullptr) ? -1 : node->m_height; };
+    int _getBalanceFactor(Node<T>* node){ return _getNodeHeight(node->smaller)-_getNodeHeight(node->larger); };
     void _updateNodeHeight(Node<T>* node);
     void _setNodeHeight(Node<T>* node, int heightL, int heightR);
     void _updateHeight(Node<T>* node);

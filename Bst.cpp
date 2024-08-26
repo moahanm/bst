@@ -1,4 +1,5 @@
 #include "Bst.h" // dummy
+#include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <string>
@@ -36,7 +37,6 @@ void BinarySearchTree<T>::_insertNode(Node<T>*& node, const T data, int depth)
         int lh = _getNodeHeight(node->smaller);
         int rh = _getNodeHeight(node->larger);
         node->m_height = std::max(lh,rh) + 1;
-        node->m_bf = lh - rh;
 
         if (m_ptrRotHead == nullptr)
         {
@@ -200,6 +200,17 @@ void BinarySearchTree<T>::_deleteTree(Node<T>*& node)
 }
 
 template<typename T>
+bool BinarySearchTree<T>::_isUnbalanced(Node<T>* node)
+{
+    if (node != nullptr)
+    {
+        int bf = _getBalanceFactor(node);
+        return abs(bf) >= 2*m_balanceOrder;
+    }
+    return false;
+}
+
+template<typename T>
 std::size_t BinarySearchTree<T>::findNodes(T data)
 {
     std::size_t ans{0};
@@ -254,7 +265,7 @@ void BinarySearchTree<T>::_fillRotationPointers()
         m_ptrRots.emplace_back(m_ptrRotHead);
         for (int i{0};i<2*m_balanceOrder;i++)
         {
-            if (m_ptrRots[i]->m_bf>0)
+            if (_getBalanceFactor(m_ptrRots[i])>0)
             {
                 m_ptrRots.emplace_back(m_ptrRots[i]->smaller);
             }
@@ -271,43 +282,80 @@ void BinarySearchTree<T>::_rotate()
     {
         // std::cout << "ROTATING AT PIVOT " << m_ptrRotHead->m_label << '\n';
         _fillRotationPointers();
-        Node<T>* ptr1 = m_ptrRots[1];
-        Node<T>* ptr2 = m_ptrRots[2];
+        Node<T>* ptr1{ nullptr };
+        Node<T>* ptr2{ nullptr };
 
-        if (m_ptrRotHead->m_bf>0 && ptr1->m_bf>0)   // R
+        if (_getBalanceFactor(m_ptrRotHead)>0)
         {
-            std::cout << "ROTATE R\n";
-            _rotate1(m_ptrParent, m_ptrRotHead, SenseType::right);
-
-            if (m_debug)
-                _updateDepth(ptr1, ptr1->m_depth-1);
+            ptr1 = m_ptrRotHead;
+            ptr2 = m_ptrRotHead->smaller;
+            for (int i{0}; i<2*m_balanceOrder-1; i++)   // straighten
+            {
+                while (ptr2->larger != nullptr)
+                {
+                    auto it = std::find(m_ptrRots.begin(),m_ptrRots.end(), ptr2->larger);
+                    if (it != m_ptrRots.end())
+                    {
+                        _rotate1(ptr1, ptr2, SenseType::left);
+                    }
+                    else
+                        break;
+                }
+                ptr1 = ptr2;
+                ptr2 = ptr2->smaller;
+            }
+            ptr1 = m_ptrParent;
+            ptr2 = m_ptrRotHead;
+            for (int i{0}; i<m_balanceOrder; i++)   // R
+            {
+                _rotate1(ptr1, ptr2, SenseType::right);
+                ptr1 = ptr2;
+                ptr2 = ptr2->smaller;
+            }
         }
-        else if (m_ptrRotHead->m_bf>0 && ptr1->m_bf<0)  // LR
+        else
         {
-            std::cout << "ROTATE LR\n";
-            _rotate1(m_ptrRotHead, ptr1, SenseType::left);
-            _rotate1(m_ptrParent, m_ptrRotHead, SenseType::right);
-
-            if (m_debug)
-                _updateDepth(ptr2, ptr2->m_depth-2);
+            ptr1 = m_ptrRotHead;
+            ptr2 = m_ptrRotHead->larger;
+            for (int i{0}; i<2*m_balanceOrder-1; i++)   // straighten
+            {
+                while (ptr2->smaller != nullptr)
+                {
+                    auto it = std::find(m_ptrRots.begin(),m_ptrRots.end(), ptr2->smaller);
+                    if (it != m_ptrRots.end())
+                    {
+                        _rotate1(ptr1, ptr2, SenseType::right);
+                    }
+                    else
+                        break;
+                }
+                ptr1 = ptr2;
+                ptr2 = ptr2->larger;
+            }
+            ptr1 = m_ptrParent;
+            ptr2 = m_ptrRotHead;
+            for (int i{0}; i<m_balanceOrder; i++)   // L
+            {
+                _rotate1(ptr1, ptr2, SenseType::left);
+                ptr1 = ptr2;
+                ptr2 = ptr2->larger;
+            }
         }
-        else if (m_ptrRotHead->m_bf<0 && ptr1->m_bf>0)  // RL
-        {
-            std::cout << "ROTATE RL\n";
-            _rotate1(m_ptrRotHead, ptr1, SenseType::right);
-            _rotate1(m_ptrParent, m_ptrRotHead, SenseType::left);
 
-            if (m_debug)
-                _updateDepth(ptr2, ptr2->m_depth-2);
-        }
-        else    // L
-        {
-            std::cout << "ROTATE L\n";
-            _rotate1(m_ptrParent, m_ptrRotHead, SenseType::left);
+        // if (_getBalanceFactor(m_ptrRotHead)>0)
+        // {
+        //     if (_getBalanceFactor(ptr1)<0)
+        //         _rotate1(m_ptrRotHead, ptr1, SenseType::left);
 
-            if (m_debug)
-                _updateDepth(ptr1, ptr1->m_depth-1);
-        }
+        //     _rotate1(m_ptrParent, m_ptrRotHead, SenseType::right);
+        // }
+        // else
+        // {
+        //     if (_getBalanceFactor(ptr1)>0)
+        //         _rotate1(m_ptrRotHead, ptr1, SenseType::right);
+
+        //     _rotate1(m_ptrParent, m_ptrRotHead, SenseType::left);
+        // }
 
     }
     m_ptrParent = nullptr;
@@ -324,7 +372,7 @@ void BinarySearchTree<T>::__rotate()
         Node<T>* ptr1 = m_ptrRots[1];
         Node<T>* ptr2 = m_ptrRots[2];
 
-        if (m_ptrRotHead->m_bf>0 && ptr1->m_bf>0)   // R
+        if (_getBalanceFactor(m_ptrRotHead)>0 && _getBalanceFactor(ptr1)>0)   // R
         {
             // std::cout << "ROTATE R\n";
             int hPtrRotR = _getNodeHeight(m_ptrRotHead->larger);
@@ -351,7 +399,7 @@ void BinarySearchTree<T>::__rotate()
             if (m_debug)
                 _updateDepth(ptr1, ptr1->m_depth-1);
         }
-        else if (m_ptrRotHead->m_bf>0 && ptr1->m_bf<0)  // LR
+        else if (_getBalanceFactor(m_ptrRotHead)>0 && _getBalanceFactor(ptr1)<0)  // LR
         {
             // std::cout << "ROTATE LR\n";
             int hPtrRotR =_getNodeHeight(m_ptrRotHead->larger);
@@ -383,7 +431,7 @@ void BinarySearchTree<T>::__rotate()
             if (m_debug)
                 _updateDepth(ptr2, ptr2->m_depth-2);
         }
-        else if (m_ptrRotHead->m_bf<0 && ptr1->m_bf>0)  // RL
+        else if (_getBalanceFactor(m_ptrRotHead)<0 && _getBalanceFactor(ptr1)>0)  // RL
         {
             // std::cout << "ROTATE RL\n";
             int hPtrRotL = _getNodeHeight(m_ptrRotHead->smaller);
@@ -504,10 +552,7 @@ template<typename T>
 void BinarySearchTree<T>::_setNodeHeight(Node<T>* node, int heightL, int heightR)
 {
     if (node != nullptr)
-    {
         node->m_height = std::max(heightL,heightR) + 1;
-        node->m_bf = heightL - heightR;
-    }
 }
 
 template<typename T>
@@ -518,7 +563,6 @@ void BinarySearchTree<T>::_updateNodeHeight(Node<T>* node)
         int hL = _getNodeHeight(node->smaller);
         int hR = _getNodeHeight(node->larger);
         node->m_height = std::max(hL,hR) + 1;
-        node->m_bf = hL - hR;
     }
 }
 
@@ -556,8 +600,7 @@ void BinarySearchTree<T>::printTree()
 {
     if (m_root != nullptr)
     {
-        if (!m_debug)
-            _updateDepth(m_root, 0);
+        _updateDepth(m_root, 0);
 
         int nlines{ m_root->m_height + 1 };
         int pWidth{2};
