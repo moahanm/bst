@@ -313,7 +313,7 @@ void BinarySearchTree<T>::_rotate()
         else if (m_ptrRot->m_bf<0 && ptr1->m_bf>0)  // RL
         {
             // std::cout << "ROTATE RL\n";
-            int hPtrRotL = _getNodeHeight(m_ptrRot->larger);
+            int hPtrRotL = _getNodeHeight(m_ptrRot->smaller);
             int hPtr1R = _getNodeHeight(ptr1->larger);
             int hPtr2L = _getNodeHeight(ptr2->smaller);
             int hPtr2R = _getNodeHeight(ptr2->larger);
@@ -367,6 +367,8 @@ void BinarySearchTree<T>::_rotate()
 
             _updateDepth(ptr1, ptr1->m_depth-1);
         }
+
+        _updateNodeHeight(m_ptrParent);
     }
     m_ptrParent = nullptr;
     m_ptrRot = nullptr;
@@ -428,8 +430,6 @@ void BinarySearchTree<T>::printTree()
 {
     if (m_root != nullptr)
     {
-        updateHeight();
-
         int nlines{ m_root->m_height + 1 };
         int pWidth{2};
         for (int i{0}; i<nlines-1; i++)
