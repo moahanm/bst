@@ -101,7 +101,7 @@ private:
     };
 
     Node<T>* m_root{ nullptr };
-    int m_balanceOrder{ 1 };
+    std::size_t m_balanceOrder{ 1 };
     bool m_debug{ false };
     std::vector<std::string> m_lines;
 
@@ -115,27 +115,28 @@ public:
     {
     }
 
-    BinarySearchTree(int balanceOrder, bool debug=false): m_balanceOrder{balanceOrder}, m_debug{debug}
+    BinarySearchTree(std::size_t balanceOrder, bool debug=false): m_balanceOrder{balanceOrder}, m_debug{debug}
     {
     }
 
-    BinarySearchTree(int balanceOrder, const std::vector<T> list, bool debug=false): m_balanceOrder{balanceOrder}, m_debug{debug}
+    BinarySearchTree(std::size_t balanceOrder, const std::vector<T> list, bool debug=false): m_balanceOrder{balanceOrder}, m_debug{debug}
     {
         for (auto& ele : list)
             insertNode(ele);
     }
 
-    BinarySearchTree(BinarySearchTree& bst) // copy constructor
-    {
-        BinarySearchTree(bst.m_balanceOrder, bst._getSeqence(), bst.m_debug);
-    }
+    // BinarySearchTree(BinarySearchTree& bst) // copy constructor
+    // {
+    //     BinarySearchTree(bst.m_balanceOrder, bst._getSequence(), bst.m_debug);
+    // }
 
     void insertNode(const T data);
     void insertNode(const std::vector<T> list);
     void deleteNodes(const T data);
-    std::size_t findNodes(T data);
-    void updateHeight();
-    int getHeight(){ return m_root->m_height; };
+    void clear(){ _deleteTree(m_root); }
+    bool findNode(const T data);
+    std::size_t findNodes(const T data);
+    int getHeight() const { return m_root->m_height; };
     void printTree();
 
     ~BinarySearchTree(){ _deleteTree(m_root); }

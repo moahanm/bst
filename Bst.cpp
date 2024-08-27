@@ -211,7 +211,44 @@ bool BinarySearchTree<T>::_isUnbalanced(Node<T>* node)
 }
 
 template<typename T>
-std::size_t BinarySearchTree<T>::findNodes(T data)
+bool BinarySearchTree<T>::findNode(const T data)
+{
+    if (m_root != nullptr)
+    {
+        Node<T>* node{ m_root };
+
+        while (true)
+        {
+            if (node->isEqual(data))
+            {
+                return true;
+            }
+            else if (node->isLessThan(data))
+            {
+                if (node->larger != nullptr)
+                {
+                    node = node->larger;
+                }
+                else
+                    return false;
+            }
+            else
+            {
+                if (node->smaller != nullptr)
+                {
+                    node = node->smaller;
+                }
+                else
+                    return false;
+            }
+        }
+    }
+    else
+        return false;
+}
+
+template<typename T>
+std::size_t BinarySearchTree<T>::findNodes(const T data)
 {
     std::size_t ans{0};
 
@@ -263,7 +300,7 @@ void BinarySearchTree<T>::_fillRotationPointers()
     if (m_ptrRotHead != nullptr)
     {
         m_ptrRots.emplace_back(m_ptrRotHead);
-        for (int i{0};i<2*m_balanceOrder;i++)
+        for (std::size_t i{0};i<2*m_balanceOrder;i++)
         {
             if (_getBalanceFactor(m_ptrRots[i])>0)
             {
@@ -287,10 +324,13 @@ void BinarySearchTree<T>::_rotate()
 
         if (_getBalanceFactor(m_ptrRotHead)>0)
         {
-            ptr1 = m_ptrRotHead;
-            ptr2 = m_ptrRotHead->smaller;
-            for (int i{0}; i<2*m_balanceOrder-1; i++)   // straighten
+            // straighten right-leaning chain
+            for (std::size_t i{0}; i<2*m_balanceOrder-1; i++)
             {
+                ptr1 = m_ptrRotHead;
+                for (std::size_t j{0}; j<i; j++)
+                    ptr1 = ptr1->smaller;
+                ptr2 = ptr1->smaller;
                 while (ptr2->larger != nullptr)
                 {
                     auto it = std::find(m_ptrRots.begin(),m_ptrRots.end(), ptr2->larger);
@@ -300,25 +340,27 @@ void BinarySearchTree<T>::_rotate()
                     }
                     else
                         break;
+                    ptr2 = ptr1->smaller;
                 }
-                ptr1 = ptr2;
-                ptr2 = ptr2->smaller;
             }
-            ptr1 = m_ptrParent;
+            // bend straight chain rightwards
             ptr2 = m_ptrRotHead;
-            for (int i{0}; i<m_balanceOrder; i++)   // R
+            for (std::size_t i{0}; i<m_balanceOrder; i++)
             {
-                _rotate1(ptr1, ptr2, SenseType::right);
                 ptr1 = ptr2;
                 ptr2 = ptr2->smaller;
+                _rotate1(m_ptrParent, ptr1, SenseType::right);
             }
         }
         else
         {
-            ptr1 = m_ptrRotHead;
-            ptr2 = m_ptrRotHead->larger;
-            for (int i{0}; i<2*m_balanceOrder-1; i++)   // straighten
+            // straighten left-leaning chain
+            for (std::size_t i{0}; i<2*m_balanceOrder-1; i++)
             {
+                ptr1 = m_ptrRotHead;
+                for (std::size_t j{0}; j<i; j++)
+                    ptr1 = ptr1->larger;
+                ptr2 = ptr1->larger;
                 while (ptr2->smaller != nullptr)
                 {
                     auto it = std::find(m_ptrRots.begin(),m_ptrRots.end(), ptr2->smaller);
@@ -328,17 +370,16 @@ void BinarySearchTree<T>::_rotate()
                     }
                     else
                         break;
+                    ptr2 = ptr1->larger;
                 }
-                ptr1 = ptr2;
-                ptr2 = ptr2->larger;
             }
-            ptr1 = m_ptrParent;
+            // bend straight chain leftwards
             ptr2 = m_ptrRotHead;
-            for (int i{0}; i<m_balanceOrder; i++)   // L
+            for (std::size_t i{0}; i<m_balanceOrder; i++)
             {
-                _rotate1(ptr1, ptr2, SenseType::left);
                 ptr1 = ptr2;
                 ptr2 = ptr2->larger;
+                _rotate1(m_ptrParent, ptr1, SenseType::left);
             }
         }
 
@@ -564,12 +605,6 @@ void BinarySearchTree<T>::_updateNodeHeight(Node<T>* node)
         int hR = _getNodeHeight(node->larger);
         node->m_height = std::max(hL,hR) + 1;
     }
-}
-
-template<typename T>
-void BinarySearchTree<T>::updateHeight()
-{
-    _updateHeight(m_root);
 }
 
 // Update height values for all nodes with root 'node' inclusive
