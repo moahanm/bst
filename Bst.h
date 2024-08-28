@@ -15,8 +15,8 @@ class Node
 {
 private:
     T m_data{};
-    Node* smaller{ nullptr };
-    Node* larger{ nullptr };
+    Node* left{ nullptr };
+    Node* right{ nullptr };
     int m_height{0};
     int m_depth{0};
     std::string m_label{""};
@@ -65,9 +65,9 @@ private:
     {
         T ans{ m_data };
         Node* ptr{ this };
-        while (ptr->smaller != nullptr)
+        while (ptr->left != nullptr)
         {
-            ptr = ptr->smaller;
+            ptr = ptr->left;
             ans = ptr->m_data;
         }
         return ans;
@@ -77,9 +77,9 @@ private:
     {
         T ans{ m_data };
         Node* ptr{ this };
-        while (ptr->larger != nullptr)
+        while (ptr->right != nullptr)
         {
-            ptr = ptr->larger;
+            ptr = ptr->right;
             ans = ptr->m_data;
         }
         return ans;
@@ -101,8 +101,8 @@ private:
     };
 
     Node<T>* m_root{ nullptr };
-    std::size_t m_balanceOrder{ 1 };
-    bool m_debug{ false };
+    std::size_t m_maxBalanceFactor{ 2 };
+    std::size_t m_rotationLength{ 3 };
     std::vector<std::string> m_lines;
 
     // for rotation
@@ -111,15 +111,15 @@ private:
     std::vector<Node<T>*> m_ptrRots{};
 
 public:
-    BinarySearchTree(bool debug=false): m_debug{debug}
+    BinarySearchTree() = default;
+    
+    BinarySearchTree(const std::size_t maxBalanceFactor): m_maxBalanceFactor{maxBalanceFactor}
     {
-    }
+    };
 
-    BinarySearchTree(std::size_t balanceOrder, bool debug=false): m_balanceOrder{balanceOrder}, m_debug{debug}
-    {
-    }
-
-    BinarySearchTree(std::size_t balanceOrder, const std::vector<T> list, bool debug=false): m_balanceOrder{balanceOrder}, m_debug{debug}
+    BinarySearchTree(const std::size_t maxBalanceFactor, const std::size_t rotationLength, const std::vector<T> list): 
+    m_maxBalanceFactor{maxBalanceFactor}, 
+    m_rotationLength{rotationLength}
     {
         for (auto& ele : list)
             insertNode(ele);
@@ -127,12 +127,13 @@ public:
 
     // BinarySearchTree(BinarySearchTree& bst) // copy constructor
     // {
-    //     BinarySearchTree(bst.m_balanceOrder, bst._getSequence(), bst.m_debug);
+    //     BinarySearchTree(bst.m_maxBalanceFactor, bst._getSequence());
     // }
 
     void insertNode(const T data);
     void insertNode(const std::vector<T> list);
     void deleteNodes(const T data);
+    void setRotationLength(const std::size_t rotationLength);
     void clear(){ _deleteTree(m_root); }
     bool findNode(const T data);
     std::size_t findNodes(const T data);
@@ -149,10 +150,10 @@ private:
     bool _isUnbalanced(Node<T>* node);
     void _fillRotationPointers();
     void _rotate();
-    void __rotate();
+    void _rotate23();
     void _rotate1(Node<T>* parentNode, Node<T>* node, SenseType sense);
     int _getNodeHeight(Node<T>* node){ return (node == nullptr) ? -1 : node->m_height; };
-    int _getBalanceFactor(Node<T>* node){ return _getNodeHeight(node->smaller)-_getNodeHeight(node->larger); };
+    int _getBalanceFactor(Node<T>* node){ return _getNodeHeight(node->left)-_getNodeHeight(node->right); };
     void _updateNodeHeight(Node<T>* node);
     void _setNodeHeight(Node<T>* node, int heightL, int heightR);
     void _updateHeight(Node<T>* node);

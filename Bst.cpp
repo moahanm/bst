@@ -1,7 +1,9 @@
 #include "Bst.h" // dummy
 #include <algorithm>
 #include <cmath>
+#include <exception>
 #include <iostream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -29,13 +31,13 @@ void BinarySearchTree<T>::_insertNode(Node<T>*& node, const T data, int depth)
     {
         if (data < node->m_data)
         {
-            _insertNode(node->smaller, data, depth+1);
+            _insertNode(node->left, data, depth+1);
         }
         else
-            _insertNode(node->larger, data, depth+1);
+            _insertNode(node->right, data, depth+1);
 
-        int lh = _getNodeHeight(node->smaller);
-        int rh = _getNodeHeight(node->larger);
+        int lh = _getNodeHeight(node->left);
+        int rh = _getNodeHeight(node->right);
         node->m_height = std::max(lh,rh) + 1;
 
         if (m_ptrRotHead == nullptr)
@@ -54,7 +56,7 @@ void BinarySearchTree<T>::_insertNode(Node<T>*& node, const T data, int depth)
 template<typename T>
 void BinarySearchTree<T>::deleteNodes(T data)
 {
-    if (m_balanceOrder>0)
+    if (m_maxBalanceFactor>0)
     {
         std::size_t count{ findNodes(data) };
         for (std::size_t i{0}; i<count; i++)
@@ -79,37 +81,33 @@ Node<T>* BinarySearchTree<T>::_deleteNode(Node<T>* node, T data)
                 delete node;
                 node = nullptr;
             }
-            else if (node->smaller != nullptr && node->larger == nullptr)
+            else if (node->left != nullptr && node->right == nullptr)
             {
                 Node<T>* ptr{ node };
-                node = node->smaller;
+                node = node->left;
                 delete ptr;
-                if (node != nullptr && m_debug)
-                    _updateDepth(node, node->m_depth-1);
             }
-            else if (node->smaller == nullptr && node->larger != nullptr)
+            else if (node->left == nullptr && node->right != nullptr)
             {
 
                 Node<T>* ptr{ node };
-                node = node->larger;
+                node = node->right;
                 delete ptr;
-                if (node != nullptr && m_debug)
-                    _updateDepth(node, node->m_depth-1);
             }
             else
             {
-                node->setData(node->smaller->findMax()); // no duplicates guaranteed in smaller subtree
-                node->smaller = _deleteNode(node->smaller, node->m_data);
+                node->setData(node->left->findMax()); // no duplicates guaranteed in left subtree
+                node->left = _deleteNode(node->left, node->m_data);
                 // no change in depth
             }
         }
         else if (node->isLessThan(data))
         {
-            node->larger = _deleteNode(node->larger, data);
+            node->right = _deleteNode(node->right, data);
         }
         else
         {
-            node->smaller = _deleteNode(node->smaller, data);
+            node->left = _deleteNode(node->left, data);
         }
 
         if (node != nullptr)
@@ -143,40 +141,34 @@ Node<T>* BinarySearchTree<T>::_deleteNodes(Node<T>* node, T data)
                 delete node;
                 node = nullptr;
             }
-            else if (node->smaller != nullptr && node->larger == nullptr)
+            else if (node->left != nullptr && node->right == nullptr)
             {
                 Node<T>* ptr{ node };
-                node = node->smaller;
+                node = node->left;
                 delete ptr;
-                if (node != nullptr && m_debug)
-                    _updateDepth(node, node->m_depth-1);
             }
-            else if (node->smaller == nullptr && node->larger != nullptr)
+            else if (node->left == nullptr && node->right != nullptr)
             {
                 Node<T>* ptr{ nullptr };
-                int d{0};
                 while (node != nullptr && node->isEqual(data))
                 {
                     ptr = node;
-                    node = node->larger;
+                    node = node->right;
                     delete ptr;
-                    d++;
                 }
-                if (node != nullptr && m_debug)
-                    _updateDepth(node, node->m_depth-d);
             }
             else
             {
-                node->setData(node->smaller->findMax()); // no duplicates guaranteed in smaller subtree
-                node->smaller = _deleteNode(node->smaller, node->m_data);
+                node->setData(node->left->findMax()); // no duplicates guaranteed in left subtree
+                node->left = _deleteNode(node->left, node->m_data);
                 // no change in depth
             }
         }
 
         if (node != nullptr)
         {
-            node->smaller = _deleteNodes(node->smaller, data);
-            node->larger = _deleteNodes(node->larger, data);
+            node->left = _deleteNodes(node->left, data);
+            node->right = _deleteNodes(node->right, data);
 
             _updateNodeHeight(node);
         }
@@ -188,12 +180,24 @@ Node<T>* BinarySearchTree<T>::_deleteNodes(Node<T>* node, T data)
 }
 
 template<typename T>
+void BinarySearchTree<T>::setRotationLength(const std::size_t rotationLength)
+{
+    if (rotationLength < 3)
+        throw std::runtime_error("rotation length must be at least 3");
+    
+    if (rotationLength > m_maxBalanceFactor + 1)
+        throw std::runtime_error("rotation length must be at most maximum balance factor + 1");
+
+    m_rotationLength = rotationLength;
+}
+
+template<typename T>
 void BinarySearchTree<T>::_deleteTree(Node<T>*& node)
 {
     if (node != nullptr)
     {
-        _deleteTree(node->smaller);
-        _deleteTree(node->larger);
+        _deleteTree(node->left);
+        _deleteTree(node->right);
         delete node;
         node = nullptr;
     }
@@ -205,7 +209,7 @@ bool BinarySearchTree<T>::_isUnbalanced(Node<T>* node)
     if (node != nullptr)
     {
         int bf = _getBalanceFactor(node);
-        return abs(bf) >= 2*m_balanceOrder;
+        return abs(bf) >= m_maxBalanceFactor;
     }
     return false;
 }
@@ -225,18 +229,18 @@ bool BinarySearchTree<T>::findNode(const T data)
             }
             else if (node->isLessThan(data))
             {
-                if (node->larger != nullptr)
+                if (node->right != nullptr)
                 {
-                    node = node->larger;
+                    node = node->right;
                 }
                 else
                     return false;
             }
             else
             {
-                if (node->smaller != nullptr)
+                if (node->left != nullptr)
                 {
-                    node = node->smaller;
+                    node = node->left;
                 }
                 else
                     return false;
@@ -261,27 +265,27 @@ std::size_t BinarySearchTree<T>::findNodes(const T data)
             if (node->isEqual(data))
             {
                 ans++;
-                if (node->larger != nullptr)
+                if (node->right != nullptr)
                 {
-                    node = node->larger;    // duplicates may exist in larger subtree
+                    node = node->right;    // duplicates may exist in right subtree
                 }
                 else
                     return ans;
             }
             else if (node->isLessThan(data))
             {
-                if (node->larger != nullptr)
+                if (node->right != nullptr)
                 {
-                    node = node->larger;
+                    node = node->right;
                 }
                 else
                     return ans;
             }
             else
             {
-                if (node->smaller != nullptr)
+                if (node->left != nullptr)
                 {
-                    node = node->smaller;
+                    node = node->left;
                 }
                 else
                     return ans;
@@ -300,14 +304,14 @@ void BinarySearchTree<T>::_fillRotationPointers()
     if (m_ptrRotHead != nullptr)
     {
         m_ptrRots.emplace_back(m_ptrRotHead);
-        for (std::size_t i{0};i<2*m_balanceOrder;i++)
+        for (std::size_t i{0};i<m_rotationLength-1;i++)
         {
             if (_getBalanceFactor(m_ptrRots[i])>0)
             {
-                m_ptrRots.emplace_back(m_ptrRots[i]->smaller);
+                m_ptrRots.emplace_back(m_ptrRots[i]->left);
             }
             else
-                m_ptrRots.emplace_back(m_ptrRots[i]->larger);
+                m_ptrRots.emplace_back(m_ptrRots[i]->right);
         }
     }
 }
@@ -325,60 +329,60 @@ void BinarySearchTree<T>::_rotate()
         if (_getBalanceFactor(m_ptrRotHead)>0)
         {
             // straighten right-leaning chain
-            for (std::size_t i{0}; i<2*m_balanceOrder-1; i++)
+            for (std::size_t i{0}; i<m_rotationLength-2; i++)
             {
                 ptr1 = m_ptrRotHead;
                 for (std::size_t j{0}; j<i; j++)
-                    ptr1 = ptr1->smaller;
-                ptr2 = ptr1->smaller;
-                while (ptr2->larger != nullptr)
+                    ptr1 = ptr1->left;
+                ptr2 = ptr1->left;
+                while (ptr2->right != nullptr)
                 {
-                    auto it = std::find(m_ptrRots.begin(),m_ptrRots.end(), ptr2->larger);
+                    auto it = std::find(m_ptrRots.begin(),m_ptrRots.end(), ptr2->right);
                     if (it != m_ptrRots.end())
                     {
                         _rotate1(ptr1, ptr2, SenseType::left);
                     }
                     else
                         break;
-                    ptr2 = ptr1->smaller;
+                    ptr2 = ptr1->left;
                 }
             }
             // bend straight chain rightwards
             ptr2 = m_ptrRotHead;
-            for (std::size_t i{0}; i<m_balanceOrder; i++)
+            for (std::size_t i{0}; i<m_rotationLength/2; i++)
             {
                 ptr1 = ptr2;
-                ptr2 = ptr2->smaller;
+                ptr2 = ptr2->left;
                 _rotate1(m_ptrParent, ptr1, SenseType::right);
             }
         }
         else
         {
             // straighten left-leaning chain
-            for (std::size_t i{0}; i<2*m_balanceOrder-1; i++)
+            for (std::size_t i{0}; i<m_rotationLength-2; i++)
             {
                 ptr1 = m_ptrRotHead;
                 for (std::size_t j{0}; j<i; j++)
-                    ptr1 = ptr1->larger;
-                ptr2 = ptr1->larger;
-                while (ptr2->smaller != nullptr)
+                    ptr1 = ptr1->right;
+                ptr2 = ptr1->right;
+                while (ptr2->left != nullptr)
                 {
-                    auto it = std::find(m_ptrRots.begin(),m_ptrRots.end(), ptr2->smaller);
+                    auto it = std::find(m_ptrRots.begin(),m_ptrRots.end(), ptr2->left);
                     if (it != m_ptrRots.end())
                     {
                         _rotate1(ptr1, ptr2, SenseType::right);
                     }
                     else
                         break;
-                    ptr2 = ptr1->larger;
+                    ptr2 = ptr1->right;
                 }
             }
             // bend straight chain leftwards
             ptr2 = m_ptrRotHead;
-            for (std::size_t i{0}; i<m_balanceOrder; i++)
+            for (std::size_t i{0}; i<m_rotationLength/2; i++)
             {
                 ptr1 = ptr2;
-                ptr2 = ptr2->larger;
+                ptr2 = ptr2->right;
                 _rotate1(m_ptrParent, ptr1, SenseType::left);
             }
         }
@@ -404,7 +408,7 @@ void BinarySearchTree<T>::_rotate()
 }
 
 template<typename T>
-void BinarySearchTree<T>::__rotate()
+void BinarySearchTree<T>::_rotate23()
 {
     if (m_ptrRotHead != nullptr)
     {
@@ -413,126 +417,20 @@ void BinarySearchTree<T>::__rotate()
         Node<T>* ptr1 = m_ptrRots[1];
         Node<T>* ptr2 = m_ptrRots[2];
 
-        if (_getBalanceFactor(m_ptrRotHead)>0 && _getBalanceFactor(ptr1)>0)   // R
+        if (_getBalanceFactor(m_ptrRotHead)>0)
         {
-            // std::cout << "ROTATE R\n";
-            int hPtrRotR = _getNodeHeight(m_ptrRotHead->larger);
-            int hPtr1R = _getNodeHeight(ptr1->larger);
+            if (_getBalanceFactor(ptr1)<0)
+                _rotate1(m_ptrRotHead, ptr1, SenseType::left);
 
-            m_ptrRotHead->smaller = ptr1->larger;
-            ptr1->larger = m_ptrRotHead;
-
-            _setNodeHeight(m_ptrRotHead, hPtr1R, hPtrRotR);
-            _updateNodeHeight(ptr1);
-
-            if (m_ptrParent != nullptr)
-            {
-                if (m_ptrParent->smaller == m_ptrRotHead)
-                {
-                    m_ptrParent->smaller = ptr1;
-                }
-                else
-                    m_ptrParent->larger = ptr1;
-            }
-            else
-                m_root = ptr1;
-
-            if (m_debug)
-                _updateDepth(ptr1, ptr1->m_depth-1);
+            _rotate1(m_ptrParent, m_ptrRotHead, SenseType::right);
         }
-        else if (_getBalanceFactor(m_ptrRotHead)>0 && _getBalanceFactor(ptr1)<0)  // LR
+        else
         {
-            // std::cout << "ROTATE LR\n";
-            int hPtrRotR =_getNodeHeight(m_ptrRotHead->larger);
-            int hPtr1L = _getNodeHeight(ptr1->smaller);
-            int hPtr2L = _getNodeHeight(ptr2->smaller);
-            int hPtr2R = _getNodeHeight(ptr2->larger);
+            if (_getBalanceFactor(ptr1)>0)
+                _rotate1(m_ptrRotHead, ptr1, SenseType::right);
 
-            m_ptrRotHead->smaller = ptr2->larger;
-            ptr1->larger = ptr2->smaller;
-            ptr2->smaller = ptr1;
-            ptr2->larger = m_ptrRotHead;
-
-            _setNodeHeight(ptr1, hPtr1L, hPtr2L);
-            _setNodeHeight(m_ptrRotHead, hPtr2R, hPtrRotR);
-            _updateNodeHeight(ptr2);
-
-            if (m_ptrParent != nullptr)
-            {
-                if (m_ptrParent->smaller == m_ptrRotHead)
-                {
-                    m_ptrParent->smaller = ptr2;
-                }
-                else
-                    m_ptrParent->larger = ptr2;
-            }
-            else
-                m_root = ptr2;
-
-            if (m_debug)
-                _updateDepth(ptr2, ptr2->m_depth-2);
+            _rotate1(m_ptrParent, m_ptrRotHead, SenseType::left);
         }
-        else if (_getBalanceFactor(m_ptrRotHead)<0 && _getBalanceFactor(ptr1)>0)  // RL
-        {
-            // std::cout << "ROTATE RL\n";
-            int hPtrRotL = _getNodeHeight(m_ptrRotHead->smaller);
-            int hPtr1R = _getNodeHeight(ptr1->larger);
-            int hPtr2L = _getNodeHeight(ptr2->smaller);
-            int hPtr2R = _getNodeHeight(ptr2->larger);
-
-            m_ptrRotHead->larger = ptr2->smaller;
-            ptr1->smaller = ptr2->larger;
-            ptr2->smaller = m_ptrRotHead;
-            ptr2->larger = ptr1;
-
-            _setNodeHeight(m_ptrRotHead, hPtrRotL, hPtr2L);
-            _setNodeHeight(ptr1, hPtr2R, hPtr1R);
-            _updateNodeHeight(ptr2);
-
-            if (m_ptrParent != nullptr)
-            {
-                if (m_ptrParent->smaller == m_ptrRotHead)
-                {
-                    m_ptrParent->smaller = ptr2;
-                }
-                else
-                    m_ptrParent->larger = ptr2;
-            }
-            else
-                m_root = ptr2;
-
-            if (m_debug)
-                _updateDepth(ptr2, ptr2->m_depth-2);
-        }
-        else    // L
-        {
-            // std::cout << "ROTATE L\n";
-            int hPtrRotL = _getNodeHeight(m_ptrRotHead->smaller);
-            int hPtr1L = _getNodeHeight(ptr1->smaller);
-
-            m_ptrRotHead->larger = ptr1->smaller;
-            ptr1->smaller = m_ptrRotHead;
-
-            _setNodeHeight(m_ptrRotHead, hPtrRotL, hPtr1L);
-            _updateNodeHeight(ptr1);
-
-            if (m_ptrParent != nullptr)
-            {
-                if (m_ptrParent->smaller == m_ptrRotHead)
-                {
-                    m_ptrParent->smaller = ptr1;
-                }
-                else
-                    m_ptrParent->larger = ptr1;
-            }
-            else
-                m_root = ptr1;
-
-            if (m_debug)
-                _updateDepth(ptr1, ptr1->m_depth-1);
-        }
-
-        _updateNodeHeight(m_ptrParent);
     }
     m_ptrParent = nullptr;
     m_ptrRotHead = nullptr;
@@ -546,39 +444,39 @@ void BinarySearchTree<T>::_rotate1(Node<T>* parentNode, Node<T>* node, SenseType
         Node<T>* node1 = nullptr;
         if (sense == SenseType::left)
         {
-            if (node->larger == nullptr)
+            if (node->right == nullptr)
                 return;
 
-            node1 = node->larger;
-            node->larger = node1->smaller;
-            node1->smaller = node;
+            node1 = node->right;
+            node->right = node1->left;
+            node1->left = node;
             if (parentNode != nullptr)
             {
-                if (parentNode->smaller == node)
+                if (parentNode->left == node)
                 {
-                    parentNode->smaller = node1;
+                    parentNode->left = node1;
                 }
                 else
-                    parentNode->larger = node1;
+                    parentNode->right = node1;
             }
             else
                 m_root = node1;
         }
         else
         {
-            if (node->smaller == nullptr)
+            if (node->left == nullptr)
                 return;
-            node1 = node->smaller;
-            node->smaller = node1->larger;
-            node1->larger = node;
+            node1 = node->left;
+            node->left = node1->right;
+            node1->right = node;
             if (parentNode != nullptr)
             {
-                if (parentNode->smaller == node)
+                if (parentNode->left == node)
                 {
-                    parentNode->smaller = node1;
+                    parentNode->left = node1;
                 }
                 else
-                    parentNode->larger = node1;
+                    parentNode->right = node1;
             }
             else
                 m_root = node1;
@@ -601,8 +499,8 @@ void BinarySearchTree<T>::_updateNodeHeight(Node<T>* node)
 {
     if (node != nullptr)
     {
-        int hL = _getNodeHeight(node->smaller);
-        int hR = _getNodeHeight(node->larger);
+        int hL = _getNodeHeight(node->left);
+        int hR = _getNodeHeight(node->right);
         node->m_height = std::max(hL,hR) + 1;
     }
 }
@@ -613,8 +511,8 @@ void BinarySearchTree<T>::_updateHeight(Node<T>* node)
 {
     if (node != nullptr)
     {
-        _updateHeight(node->smaller);
-        _updateHeight(node->larger);
+        _updateHeight(node->left);
+        _updateHeight(node->right);
         _updateNodeHeight(node);
     }
 }
@@ -625,8 +523,8 @@ void BinarySearchTree<T>::_updateDepth(Node<T>* node, int depth)
     if (node != nullptr)
     {
         node->m_depth = depth;
-        _updateDepth(node->smaller, depth+1);
-        _updateDepth(node->larger, depth+1);
+        _updateDepth(node->left, depth+1);
+        _updateDepth(node->right, depth+1);
     }
 }
 
@@ -680,7 +578,7 @@ void BinarySearchTree<T>::_printNode(Node<T>*& node, int x, int y)
         for (int i{0}; i<H-d-1; i++)
             shift *= 2;
 
-        _printNode(node->smaller, x-shift, y+1);
-        _printNode(node->larger, x+shift, y+1);
+        _printNode(node->left, x-shift, y+1);
+        _printNode(node->right, x+shift, y+1);
     }
 }
