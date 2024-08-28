@@ -9,8 +9,6 @@
 
 int main()
 {
-    const int nNodes = 100000;
-
     {
     // 2-3 rotation test
     // BinarySearchTree<int> bst{2};
@@ -145,8 +143,12 @@ int main()
     // bst.printTree();
 
 
+    const int nNodes{100000};
+    const int Nave{100};
     Timer tictoc;
-    int numberToFind{Random::get(0,10*nNodes)};
+    std::vector<int> numbersToFind{};
+    for (int k{0}; k<Nave; k++)
+        numbersToFind.push_back(Random::get(0,10*nNodes));
 
     std::vector<std::size_t> vecMaxBF{2,3,4,5,6,7};
     std::vector<double> vecTimeInsert{};
@@ -157,16 +159,21 @@ int main()
     {
         BinarySearchTree<int> bst{vecMaxBF[bf]};
         bst.setRotationLength(3);
+
         tictoc.reset();
         for (int i{0}; i<nNodes; i++)
             bst.insertNode(Random::get(0,100*nNodes));
         vecTimeInsert.push_back(tictoc.elapsed());
+
         tictoc.reset();
-        bst.insertNode(numberToFind);
-        vecTimeInsert1.push_back(tictoc.elapsed());
+        bst.insertNode(numbersToFind);
+        vecTimeInsert1.push_back(tictoc.elapsed()/Nave);
+
         tictoc.reset();
-        bst.findNode(numberToFind);
-        vecTimeFind.push_back(tictoc.elapsed());
+        for (int k{0}; k<Nave; k++)
+            bst.findNode(numbersToFind[k]);
+        vecTimeFind.push_back(tictoc.elapsed()/Nave);
+
         vecHeight.push_back(bst.getHeight());
     }
     std::cout << "Binary Search Tree (rotation length = 3):\n";
@@ -187,16 +194,21 @@ int main()
     {
         BinarySearchTree<int> bst{6};
         bst.setRotationLength(vecRotLen[rl]);
+
         tictoc.reset();
         for (int i{0}; i<nNodes; i++)
             bst.insertNode(Random::get(0,100*nNodes));
         vecTimeInsert.push_back(tictoc.elapsed());
+
         tictoc.reset();
-        bst.insertNode(numberToFind);
-        vecTimeInsert1.push_back(tictoc.elapsed());
+        bst.insertNode(numbersToFind);
+        vecTimeInsert1.push_back(tictoc.elapsed()/Nave);
+
         tictoc.reset();
-        bst.findNode(numberToFind);
-        vecTimeFind.push_back(tictoc.elapsed());
+        for (int k{0}; k<Nave; k++)
+            bst.findNode(numbersToFind[k]);
+        vecTimeFind.push_back(tictoc.elapsed()/Nave);
+
         vecHeight.push_back(bst.getHeight());
     }
     std::cout << "Binary Search Tree (max balance factor = 6):\n";
@@ -210,18 +222,26 @@ int main()
 
     std::cout << "Sorted list:\n";
     std::vector<int> vecList{};
+    
     tictoc.reset();
     for (int i{0}; i<nNodes; i++)
         vecList.push_back(Random::get(0,100*nNodes));
     std::sort(vecList.begin(),vecList.end());
     double timeInsert{tictoc.elapsed()};
+
     tictoc.reset();
-    vecList.push_back(numberToFind);
-    std::sort(vecList.begin(),vecList.end());
-    double timeInsert1{tictoc.elapsed()};
+    for (int k{0}; k<Nave; k++)
+    {
+        vecList.push_back(numbersToFind[k]);
+        std::sort(vecList.begin(),vecList.end());
+    }
+    double timeInsert1{tictoc.elapsed()/Nave};
+
     tictoc.reset();
-    auto it = std::lower_bound(vecList.begin(),vecList.end(),numberToFind);
-    double timeFind{tictoc.elapsed()};
+    for (int k{0}; k<Nave; k++)
+        auto it = std::lower_bound(vecList.begin(),vecList.end(),numbersToFind[k]);
+    double timeFind{tictoc.elapsed()/Nave};
+
     std::cout << "INSERT: " << timeInsert << ", " << timeInsert1 << "(1) FIND: " << timeFind << '\n';
 
 

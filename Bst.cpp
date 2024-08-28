@@ -386,22 +386,6 @@ void BinarySearchTree<T>::_rotate()
                 _rotate1(m_ptrParent, ptr1, SenseType::left);
             }
         }
-
-        // if (_getBalanceFactor(m_ptrRotHead)>0)
-        // {
-        //     if (_getBalanceFactor(ptr1)<0)
-        //         _rotate1(m_ptrRotHead, ptr1, SenseType::left);
-
-        //     _rotate1(m_ptrParent, m_ptrRotHead, SenseType::right);
-        // }
-        // else
-        // {
-        //     if (_getBalanceFactor(ptr1)>0)
-        //         _rotate1(m_ptrRotHead, ptr1, SenseType::right);
-
-        //     _rotate1(m_ptrParent, m_ptrRotHead, SenseType::left);
-        // }
-
     }
     m_ptrParent = nullptr;
     m_ptrRotHead = nullptr;
