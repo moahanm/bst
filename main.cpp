@@ -1,5 +1,6 @@
 #include "Bst.h"
 #include <chrono>
+#include "Dictionary.h"
 #include <iostream>
 #include <iomanip>
 #include "../Random.h"
@@ -9,15 +10,12 @@
 
 int main()
 {
+
     {
     // 2-3 rotation test
     BinarySearchTree<int> bst{2};
     bst.setRotationLength(3);
     bst.insertNode({40,20,10,25,30,22,50});
-    std::vector<int> bstseq{ bst.getSequence() };
-    for (const auto& ele : bstseq)
-        std::cout << ele << " ";
-    std::cout << '\n';
     bst.printTree();
     /* answer
              025
@@ -175,7 +173,7 @@ int main()
 
         tictoc.reset();
         for (int k{0}; k<Nave; k++)
-            bst.findNode(numbersToFind[k]);
+            bst.findNodes(numbersToFind[k]);
         vecTimeFind.push_back(tictoc.elapsed()/Nave);
 
         vecHeight.push_back(bst.getHeight());
@@ -210,7 +208,7 @@ int main()
 
         tictoc.reset();
         for (int k{0}; k<Nave; k++)
-            bst.findNode(numbersToFind[k]);
+            bst.findNodes(numbersToFind[k]);
         vecTimeFind.push_back(tictoc.elapsed()/Nave);
 
         vecHeight.push_back(bst.getHeight());

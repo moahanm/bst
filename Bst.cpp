@@ -205,18 +205,7 @@ void BinarySearchTree<T>::_deleteTree(Node<T>*& node)
 }
 
 template<typename T>
-bool BinarySearchTree<T>::_isUnbalanced(Node<T>* node)
-{
-    if (node != nullptr)
-    {
-        int bf = _getBalanceFactor(node);
-        return abs(bf) >= m_maxBalanceFactor;
-    }
-    return false;
-}
-
-template<typename T>
-bool BinarySearchTree<T>::findNode(const T data)
+Node<T>* BinarySearchTree<T>::_getNode(const T data)
 {
     if (m_root != nullptr)
     {
@@ -226,7 +215,7 @@ bool BinarySearchTree<T>::findNode(const T data)
         {
             if (node->isEqual(data))
             {
-                return true;
+                return node;
             }
             else if (node->isLessThan(data))
             {
@@ -235,7 +224,7 @@ bool BinarySearchTree<T>::findNode(const T data)
                     node = node->right;
                 }
                 else
-                    return false;
+                    return nullptr;
             }
             else
             {
@@ -244,12 +233,23 @@ bool BinarySearchTree<T>::findNode(const T data)
                     node = node->left;
                 }
                 else
-                    return false;
+                    return nullptr;
             }
         }
     }
     else
-        return false;
+        return nullptr;
+}
+
+template<typename T>
+bool BinarySearchTree<T>::_isUnbalanced(Node<T>* node)
+{
+    if (node != nullptr)
+    {
+        int bf = _getBalanceFactor(node);
+        return abs(bf) >= m_maxBalanceFactor;
+    }
+    return false;
 }
 
 template<typename T>

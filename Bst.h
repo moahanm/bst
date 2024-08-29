@@ -28,7 +28,7 @@ private:
         os >> m_label;
     };
 
-    T getData() const
+    T& getData()
     {
         return m_data;
     }
@@ -46,19 +46,9 @@ private:
         return m_data == data;
     };
 
-    bool isEqual(const Node& node)
-    {
-        return m_data == node.m_data;
-    };
-
     bool isLessThan(const T data)
     {
         return m_data < data;
-    };
-
-    bool isLessThan(const Node& node)
-    {
-        return m_data < node.m_data;
     };
 
     T findMin()
@@ -103,19 +93,21 @@ private:
     Node<T>* m_root{ nullptr };
     std::size_t m_maxBalanceFactor{ 2 };
     std::size_t m_rotationLength{ 3 };
-    std::vector<std::string> m_lines;
 
-    // for rotation
+    // rotation
     Node<T>* m_ptrParent{ nullptr };
     Node<T>* m_ptrRotHead{ nullptr };
     std::vector<Node<T>*> m_ptrRots{};
+
+    // printing
+    std::vector<std::string> m_lines;
 
 public:
     BinarySearchTree() = default;
     
     BinarySearchTree(const std::size_t maxBalanceFactor): m_maxBalanceFactor{maxBalanceFactor}
     {
-    };
+    }
 
     BinarySearchTree(const std::size_t maxBalanceFactor, const std::size_t rotationLength, const std::vector<T> list): 
     m_maxBalanceFactor{maxBalanceFactor}, 
@@ -125,29 +117,24 @@ public:
             insertNode(ele);
     }
 
-    // BinarySearchTree(BinarySearchTree& bst) // copy constructor
-    // {
-    //     BinarySearchTree(bst.m_maxBalanceFactor, bst._getSequence());
-    // }
-
     void insertNode(const T data);
     void insertNode(const std::vector<T> list);
     void deleteNodes(const T data);
     void setRotationLength(const std::size_t rotationLength);
     void clear(){ _deleteTree(m_root); }
-    bool findNode(const T data);
     std::size_t findNodes(const T data);
     int getHeight() const { return m_root->m_height; };
     std::vector<T> getSequence();
     void printTree();
 
-    ~BinarySearchTree(){ _deleteTree(m_root); }
+    virtual ~BinarySearchTree(){ _deleteTree(m_root); }
 
-private:
+protected:
     void _insertNode(Node<T>*& node, const T data, int depth);
     Node<T>* _deleteNode(Node<T>* node, T data);
     Node<T>* _deleteNodes(Node<T>* node, T data);
     void _deleteTree(Node<T>*& node);
+    Node<T>* _getNode(const T data);
     bool _isUnbalanced(Node<T>* node);
     void _fillRotationPointers();
     void _rotate();
