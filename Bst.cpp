@@ -3,6 +3,7 @@
 #include <cmath>
 #include <exception>
 #include <iostream>
+#include <queue>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -510,6 +511,32 @@ void BinarySearchTree<T>::_updateDepth(Node<T>* node, int depth)
         _updateDepth(node->left, depth+1);
         _updateDepth(node->right, depth+1);
     }
+}
+
+template<typename T>
+std::vector<T> BinarySearchTree<T>::getSequence()
+{
+    std::vector<T> ans{};
+    if (m_root != nullptr)
+    {
+        std::queue<Node<T>*> q{};
+        q.emplace(m_root);
+
+        while(!q.empty())
+        {
+            Node<T>* node{ q.front() };
+
+            if (node->left != nullptr)
+                q.emplace(node->left);
+            if (node->right != nullptr)
+                q.emplace(node->right);
+
+            ans.emplace_back(node->getData());
+
+            q.pop();
+        }
+    }
+    return ans;
 }
 
 template<typename T>

@@ -28,7 +28,7 @@ private:
         os >> m_label;
     };
 
-    T& getData() const
+    T getData() const
     {
         return m_data;
     }
@@ -138,6 +138,7 @@ public:
     bool findNode(const T data);
     std::size_t findNodes(const T data);
     int getHeight() const { return m_root->m_height; };
+    std::vector<T> getSequence();
     void printTree();
 
     ~BinarySearchTree(){ _deleteTree(m_root); }
@@ -158,7 +159,6 @@ private:
     void _setNodeHeight(Node<T>* node, int heightL, int heightR);
     void _updateHeight(Node<T>* node);
     void _updateDepth(Node<T>* node, int depth);
-    std::vector<T> _getSequence(){ return {0}; };  // TODO: for deep copying
     void _printNode(Node<T>*& node, int x, int y);
 
 };

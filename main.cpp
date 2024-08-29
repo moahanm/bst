@@ -11,10 +11,14 @@ int main()
 {
     {
     // 2-3 rotation test
-    // BinarySearchTree<int> bst{2};
-    // bst.setRotationLength(3);
-    // bst.insertNode({40,20,10,25,30,22,50});
-    // bst.printTree();
+    BinarySearchTree<int> bst{2};
+    bst.setRotationLength(3);
+    bst.insertNode({40,20,10,25,30,22,50});
+    std::vector<int> bstseq{ bst.getSequence() };
+    for (const auto& ele : bstseq)
+        std::cout << ele << " ";
+    std::cout << '\n';
+    bst.printTree();
     /* answer
              025
 
@@ -142,7 +146,7 @@ int main()
     // std::cout << "AFTER deleting 5:\n";
     // bst.printTree();
 
-
+    /*
     const int nNodes{100000};
     const int Nave{100};
     Timer tictoc;
@@ -244,6 +248,6 @@ int main()
 
     std::cout << "INSERT: " << timeInsert << ", " << timeInsert1 << "(1) FIND: " << timeFind << '\n';
 
-
+    */
     return 0;
 }
