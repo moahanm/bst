@@ -10,32 +10,39 @@
 
 
 template<typename T>
-void BinarySearchTree<T>::insertNode(const T data)
+void BinarySearchTree<T>::insertNode(const T& data, std::string label)
 {
-    _insertNode(m_root, data, 0);
+    _insertNode(m_root, data, 0, label);
     // std::cout << "INSERTED " << data << '\n';
     _rotate();
 }
 
 template<typename T>
-void BinarySearchTree<T>::insertNode(const std::vector<T> list)
+void BinarySearchTree<T>::insertNode(const std::vector<T>& list, std::vector<std::string> labels)
 {
-    for (const auto& ele : list)
-        insertNode(ele);
+    for (std::size_t i{0}; i<list.size(); i++)
+    {
+        if (labels.size() == 0)
+        {
+            insertNode(list[i]);
+        }
+        else
+            insertNode(list[i], labels[i]);
+    }
 }
 
 
 template<typename T>
-void BinarySearchTree<T>::_insertNode(Node<T>*& node, const T data, int depth)
+void BinarySearchTree<T>::_insertNode(Node<T>*& node, const T& data, int depth, std::string label)
 {
     if (node != nullptr)
     {
         if (data < node->m_data)
         {
-            _insertNode(node->left, data, depth+1);
+            _insertNode(node->left, data, depth+1, label);
         }
         else
-            _insertNode(node->right, data, depth+1);
+            _insertNode(node->right, data, depth+1, label);
 
         int lh = _getNodeHeight(node->left);
         int rh = _getNodeHeight(node->right);
@@ -50,12 +57,16 @@ void BinarySearchTree<T>::_insertNode(Node<T>*& node, const T data, int depth)
             m_ptrParent = node;
     }
     else
-        node = new Node{data, depth};
+    {
+        node = new Node{data, depth, label};
+        if (label.size() > printSpace)
+            printSpace = label.size();
+    }
 }
 
 // Delete all nodes with data 'data'
 template<typename T>
-void BinarySearchTree<T>::deleteNodes(T data)
+void BinarySearchTree<T>::deleteNodes(const T& data)
 {
     if (m_maxBalanceFactor>0)
     {
@@ -71,11 +82,11 @@ void BinarySearchTree<T>::deleteNodes(T data)
 }
 
 template<typename T>
-Node<T>* BinarySearchTree<T>::_deleteNode(Node<T>* node, T data)
+Node<T>* BinarySearchTree<T>::_deleteNode(Node<T>* node, const T& data)
 {
     if (node != nullptr)
     {
-        if (node->isEqual(data))
+        if (*node == data)
         {
             if (node->m_height == 0)
             {
@@ -97,12 +108,12 @@ Node<T>* BinarySearchTree<T>::_deleteNode(Node<T>* node, T data)
             }
             else
             {
-                node->setData(node->left->findMax()); // no duplicates guaranteed in left subtree
+                node->copyNode(node->left->findMax()); // no duplicates guaranteed in left subtree
                 node->left = _deleteNode(node->left, node->m_data);
                 // no change in depth
             }
         }
-        else if (node->isLessThan(data))
+        else if (*node < data)
         {
             node->right = _deleteNode(node->right, data);
         }
@@ -131,11 +142,11 @@ Node<T>* BinarySearchTree<T>::_deleteNode(Node<T>* node, T data)
 }
 
 template<typename T>
-Node<T>* BinarySearchTree<T>::_deleteNodes(Node<T>* node, T data)
+Node<T>* BinarySearchTree<T>::_deleteNodes(Node<T>* node, const T& data)
 {
     if (node != nullptr)
     {
-        if (node->isEqual(data))
+        if (*node == data)
         {
             if (node->m_height == 0)
             {
@@ -151,7 +162,7 @@ Node<T>* BinarySearchTree<T>::_deleteNodes(Node<T>* node, T data)
             else if (node->left == nullptr && node->right != nullptr)
             {
                 Node<T>* ptr{ nullptr };
-                while (node != nullptr && node->isEqual(data))
+                while (node != nullptr && *node == data)
                 {
                     ptr = node;
                     node = node->right;
@@ -160,7 +171,7 @@ Node<T>* BinarySearchTree<T>::_deleteNodes(Node<T>* node, T data)
             }
             else
             {
-                node->setData(node->left->findMax()); // no duplicates guaranteed in left subtree
+                node->copyNode(node->left->findMax()); // no duplicates guaranteed in left subtree
                 node->left = _deleteNode(node->left, node->m_data);
                 // no change in depth
             }
@@ -186,8 +197,8 @@ void BinarySearchTree<T>::setRotationLength(const std::size_t rotationLength)
     if (rotationLength < 3)
         throw std::runtime_error("rotation length must be at least 3");
     
-    if (rotationLength > m_maxBalanceFactor + 1)
-        throw std::runtime_error("rotation length must be at most maximum balance factor + 1");
+    if (rotationLength > m_maxBalanceFactor + 2)
+        throw std::runtime_error("rotation length must be at most maximum balance factor + 2");
 
     m_rotationLength = rotationLength;
 }
@@ -205,7 +216,7 @@ void BinarySearchTree<T>::_deleteTree(Node<T>*& node)
 }
 
 template<typename T>
-Node<T>* BinarySearchTree<T>::_getNode(const T data)
+Node<T>* BinarySearchTree<T>::_getNode(const T& data)
 {
     if (m_root != nullptr)
     {
@@ -213,11 +224,11 @@ Node<T>* BinarySearchTree<T>::_getNode(const T data)
 
         while (true)
         {
-            if (node->isEqual(data))
+            if (*node == data)
             {
                 return node;
             }
-            else if (node->isLessThan(data))
+            else if (*node < data)
             {
                 if (node->right != nullptr)
                 {
@@ -247,13 +258,13 @@ bool BinarySearchTree<T>::_isUnbalanced(Node<T>* node)
     if (node != nullptr)
     {
         int bf = _getBalanceFactor(node);
-        return abs(bf) >= m_maxBalanceFactor;
+        return abs(bf) > m_maxBalanceFactor;
     }
     return false;
 }
 
 template<typename T>
-std::size_t BinarySearchTree<T>::findNodes(const T data)
+std::size_t BinarySearchTree<T>::findNodes(const T& data)
 {
     std::size_t ans{0};
 
@@ -263,7 +274,7 @@ std::size_t BinarySearchTree<T>::findNodes(const T data)
 
         while (true)
         {
-            if (node->isEqual(data))
+            if (*node == data)
             {
                 ans++;
                 if (node->right != nullptr)
@@ -273,7 +284,7 @@ std::size_t BinarySearchTree<T>::findNodes(const T data)
                 else
                     return ans;
             }
-            else if (node->isLessThan(data))
+            else if (*node < data)
             {
                 if (node->right != nullptr)
                 {
@@ -393,7 +404,7 @@ void BinarySearchTree<T>::_rotate()
 }
 
 template<typename T>
-void BinarySearchTree<T>::_rotate23()
+void BinarySearchTree<T>::_rotate13()
 {
     if (m_ptrRotHead != nullptr)
     {
@@ -555,7 +566,7 @@ void BinarySearchTree<T>::printTree()
         // Recreate canvas
         std::string line{""};
         for (int w{0}; w<pWidth; w++)
-            for (int i{0}; i<PRINTSPACE; i++)
+            for (int i{0}; i<printSpace; i++)
                 line += ' ';
         m_lines.clear();
         for (int h{0}; h<nlines; h++)
@@ -569,9 +580,7 @@ void BinarySearchTree<T>::printTree()
             std::cout << m_lines[h] << "\n\n";
     }
     else
-    {
         std::cout << "Null tree\n";
-    }
 }
 
 template<typename T>
@@ -580,8 +589,9 @@ void BinarySearchTree<T>::_printNode(Node<T>*& node, int x, int y)
     if (node != nullptr)
     {
         std::string& line{ m_lines[y] };
-        for (int i{0}; i<PRINTSPACE; i++)
-            line[x*PRINTSPACE+i] = node->m_label[i];
+        std::size_t buf{ printSpace - node->m_label.size() };
+        for (int i{0}; i<node->m_label.size(); i++)
+            line[x*printSpace+buf+i] = node->m_label[i];
 
         int H{m_root->m_height};
         int d{node->m_depth};

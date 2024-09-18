@@ -3,6 +3,7 @@
 #include "Dictionary.h"
 #include <iostream>
 #include <iomanip>
+#include "Point2d.h"
 #include "../Random.h"
 #include <string>
 #include "../Timer.h"
@@ -10,21 +11,34 @@
 
 int main()
 {
-
     {
-    // 2-3 rotation test
-    BinarySearchTree<int> bst{2};
-    bst.setRotationLength(3);
-    bst.insertNode({40,20,10,25,30,22,50});
+    // 1-3 rotation test on Custom object
+    BinarySearchTree<Point2d> bst{1};
+    bst.insertNode(Point2d(4.,4.), "(4,4)");
+    bst.insertNode(Point2d(2.,2.), "(2,2)");
+    bst.insertNode(Point2d(1.,1.), "(1,1)");
+    bst.insertNode(Point2d(2.5,2.5), "(2.5,2.5)");
+    bst.insertNode(Point2d(3.,3.), "(3,3)");
+    bst.insertNode(Point2d(2.2,2.2), "(2.2,2.2)");
+    bst.insertNode(Point2d(5.,5.), "(5,5)");
     bst.printTree();
-    /* answer
-             025
-
-       020         040
-
-    010   022   030   050
-    */
     }
+
+
+    // {
+    // // 1-3 rotation test
+    // BinarySearchTree<int> bst{1};
+    // bst.setRotationLength(3);
+    // bst.insertNode({40,20,10,25,30,22,50}, {"040","020","010","025","030","0022","050"});
+    // bst.printTree();
+    // /* answer
+    //          025
+
+    //    020         040
+
+    // 010   022   030   050
+    // */
+    // }
 
 
     // bst.insertNode(2);
@@ -49,9 +63,9 @@ int main()
     // bst.insertNode(6);
     // bst.insertNode(-8);
 
-    {
+    // {
     // for 2nd order rotations
-    // bst.clear();
+    // BinarySearchTree<int> bst{2};
     // bst.insertNode({90,70,50,30});
     // bst.printTree();
     // bst.insertNode(10);
@@ -72,11 +86,11 @@ int main()
     // bst.clear();
     // bst.insertNode({40,20,10,25,30,22,50,28,27});
     // bst.printTree();
-    }
+    // }
 
-    {
-    // 3-3 rotation test
-    // BinarySearchTree<int> bst{3};
+    // {
+    // 2-3 rotation test
+    // BinarySearchTree<int> bst{2};
     // bst.setRotationLength(3);
     // bst.insertNode({40,20,10,25,30});
     // bst.printTree();
@@ -99,11 +113,11 @@ int main()
                          028
 
     */
-    }
+    // }
 
-    {
-    // 4-3 rotation test
-    // BinarySearchTree<int> bst{4};
+    // {
+    // 3-3 rotation test
+    // BinarySearchTree<int> bst{3};
     // bst.setRotationLength(3);
     // bst.insertNode({40,20,10,25,30,22,28});
     // bst.printTree();
@@ -116,11 +130,11 @@ int main()
 
                          028
     */
-    }
+    // }
 
-    {
-    // 4-4 rotation test
-    // BinarySearchTree<int> bst{4};
+    // {
+    // 3-4 rotation test
+    // BinarySearchTree<int> bst{3};
     // bst.setRotationLength(4);
     // bst.insertNode({40,20,10,25,30,22,28});
     // bst.printTree();
@@ -132,7 +146,7 @@ int main()
     010   022   028   040
     
     */
-    }
+    // }
 
     // std::cout << "NUMBER OF 5s: " << bst.findNodes(5) << '\n';
 
@@ -152,7 +166,7 @@ int main()
     for (int k{0}; k<Nave; k++)
         numbersToFind.push_back(Random::get(0,10*nNodes));
 
-    std::vector<std::size_t> vecMaxBF{2,3,4,5,6,7};
+    std::vector<std::size_t> vecMaxBF{1,2,3,4,5,6};
     std::vector<double> vecTimeInsert{};
     std::vector<double> vecTimeInsert1{};
     std::vector<double> vecTimeFind{};
@@ -194,7 +208,7 @@ int main()
     vecHeight.clear();
     for (std::size_t rl{0}; rl<vecRotLen.size(); rl++)
     {
-        BinarySearchTree<int> bst{6};
+        BinarySearchTree<int> bst{5};
         bst.setRotationLength(vecRotLen[rl]);
 
         tictoc.reset();
@@ -213,7 +227,7 @@ int main()
 
         vecHeight.push_back(bst.getHeight());
     }
-    std::cout << "Binary Search Tree (max balance factor = 6):\n";
+    std::cout << "Binary Search Tree (max balance factor = 5):\n";
     std::cout << "log( " << nNodes << " ) = " << std::log(nNodes) << '\n';
     for (std::size_t rl{0}; rl<vecRotLen.size(); rl++)
     {

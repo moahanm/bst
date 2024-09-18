@@ -5,8 +5,6 @@
 #include <string>
 #include <vector>
 
-constexpr int PRINTSPACE{ 3 };
-
 template<typename T>
 class BinarySearchTree;
 
@@ -14,66 +12,47 @@ template<typename T>
 class Node
 {
 private:
-    T m_data{};
+    T m_data;   // no default constructor assumed
     Node* left{ nullptr };
     Node* right{ nullptr };
     int m_height{0};
     int m_depth{0};
     std::string m_label{""};
 
-    Node(T data, int depth): m_data{data}, m_depth{depth}
+    Node(const T& data, int depth, std::string label=""): m_data{data}, m_depth{depth}, m_label{label}
     {
-        std::stringstream os{};
-        os << std::setfill('0') << std::setw(PRINTSPACE) << m_data;
-        os >> m_label;
-    };
+    }
 
     T& getData()
     {
         return m_data;
     }
 
-    void setData(const T data)  // should not use "m_data =" as label needs updating
+    void copyNode(const Node* node)  // should not use "m_data =" as label needs updating
     {
-        m_data = data;
-        std::stringstream os{};
-        os << std::setfill('0') << std::setw(PRINTSPACE) << m_data;
-        os >> m_label;
-    };
+        m_data = node->m_data;
+        m_label = node->m_label;
+    }
 
-    bool isEqual(const T data)
+    Node* findMin()
     {
-        return m_data == data;
-    };
-
-    bool isLessThan(const T data)
-    {
-        return m_data < data;
-    };
-
-    T findMin()
-    {
-        T ans{ m_data };
         Node* ptr{ this };
         while (ptr->left != nullptr)
-        {
             ptr = ptr->left;
-            ans = ptr->m_data;
-        }
-        return ans;
-    };
+        return ptr;
+    }
 
-    T findMax()
+    Node* findMax()
     {
-        T ans{ m_data };
         Node* ptr{ this };
         while (ptr->right != nullptr)
-        {
             ptr = ptr->right;
-            ans = ptr->m_data;
-        }
-        return ans;
-    };
+        return ptr;
+    }
+
+    bool operator==(const T& data) const { return m_data == data; }
+
+    bool operator<(const T& data) const { return m_data < data; }
 
     friend class BinarySearchTree<T>;
 };
@@ -91,7 +70,7 @@ private:
     };
 
     Node<T>* m_root{ nullptr };
-    std::size_t m_maxBalanceFactor{ 2 };
+    std::size_t m_maxBalanceFactor{ 1 };
     std::size_t m_rotationLength{ 3 };
 
     // rotation
@@ -100,29 +79,37 @@ private:
     std::vector<Node<T>*> m_ptrRots{};
 
     // printing
+    std::size_t printSpace{ 1 };
     std::vector<std::string> m_lines;
 
 public:
     BinarySearchTree() = default;
     
-    BinarySearchTree(const std::size_t maxBalanceFactor): m_maxBalanceFactor{maxBalanceFactor}
+    BinarySearchTree(std::size_t maxBalanceFactor): m_maxBalanceFactor{maxBalanceFactor}
     {
     }
 
-    BinarySearchTree(const std::size_t maxBalanceFactor, const std::size_t rotationLength, const std::vector<T> list): 
+    BinarySearchTree(std::size_t maxBalanceFactor, std::size_t rotationLength, const std::vector<T>& list, std::vector<std::string> labels = std::vector<std::string>()): 
     m_maxBalanceFactor{maxBalanceFactor}, 
     m_rotationLength{rotationLength}
     {
-        for (auto& ele : list)
-            insertNode(ele);
+        for (std::size_t i{0}; i<list.size(); i++)
+        {
+            if (labels.size() == 0)
+            {
+                insertNode(list[i]);
+            }
+            else
+                insertNode(list[i], labels[i]);
+        }
     }
 
-    void insertNode(const T data);
-    void insertNode(const std::vector<T> list);
-    void deleteNodes(const T data);
+    void insertNode(const T& data, std::string label="");
+    void insertNode(const std::vector<T>& list, std::vector<std::string> labels=std::vector<std::string>());
+    void deleteNodes(const T& data);
     void setRotationLength(const std::size_t rotationLength);
     void clear(){ _deleteTree(m_root); }
-    std::size_t findNodes(const T data);
+    std::size_t findNodes(const T& data);
     int getHeight() const { return m_root->m_height; };
     std::vector<T> getSequence();
     void printTree();
@@ -130,15 +117,15 @@ public:
     virtual ~BinarySearchTree(){ _deleteTree(m_root); }
 
 protected:
-    void _insertNode(Node<T>*& node, const T data, int depth);
-    Node<T>* _deleteNode(Node<T>* node, T data);
-    Node<T>* _deleteNodes(Node<T>* node, T data);
+    void _insertNode(Node<T>*& node, const T& data, int depth, std::string label);
+    Node<T>* _deleteNode(Node<T>* node, const T& data);
+    Node<T>* _deleteNodes(Node<T>* node, const T& data);
     void _deleteTree(Node<T>*& node);
-    Node<T>* _getNode(const T data);
+    Node<T>* _getNode(const T& data);
     bool _isUnbalanced(Node<T>* node);
     void _fillRotationPointers();
     void _rotate();
-    void _rotate23();
+    void _rotate13();
     void _rotate1(Node<T>* parentNode, Node<T>* node, SenseType sense);
     int _getNodeHeight(Node<T>* node){ return (node == nullptr) ? -1 : node->m_height; };
     int _getBalanceFactor(Node<T>* node){ return _getNodeHeight(node->left)-_getNodeHeight(node->right); };
