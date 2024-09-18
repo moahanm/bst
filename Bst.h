@@ -1,9 +1,33 @@
 #ifndef BST_H
 #define BST_H
 
-#include <iomanip>
 #include <string>
 #include <vector>
+
+/*
+BinarySearchTree is a generalisation of the AVL binary search tree, with custom
+- maximum balance factor (e.g. 1 for AVL)
+- rotation length (e.g. 3 for AVL)
+
+Example #1: m_maxBalanceFactor = 1
+
+m_rotationLength = 3
+
+        A                   B                       A                       C
+    B           =>      C       A       or      B               =>      B       A
+  C                                               C
+
+Example #2: m_maxBalanceFactor = 2
+
+m_rotationLength = 3                                m_rotationLength = 5
+
+                A                       B                               A                       E
+            B           =>          C       A                       B           =>          D       B
+        C                             D                         C                         C           A
+          D                            E                          D
+           E                                                       E
+
+*/
 
 template<typename T>
 class BinarySearchTree;
@@ -17,18 +41,15 @@ private:
     Node* right{ nullptr };
     int m_height{0};
     int m_depth{0};
-    std::string m_label{""};
+    std::string m_label{""};    // for printing
 
     Node(const T& data, int depth, std::string label=""): m_data{data}, m_depth{depth}, m_label{label}
     {
     }
 
-    T& getData()
-    {
-        return m_data;
-    }
+    T& getData(){ return m_data; }
 
-    void copyNode(const Node* node)  // should not use "m_data =" as label needs updating
+    void copyNode(const Node* node)
     {
         m_data = node->m_data;
         m_label = node->m_label;
@@ -62,7 +83,6 @@ template<typename T>
 class BinarySearchTree
 {
 private:
-
     enum SenseType
     {
         left,
@@ -84,7 +104,7 @@ private:
 
 public:
     BinarySearchTree() = default;
-    
+
     BinarySearchTree(std::size_t maxBalanceFactor): m_maxBalanceFactor{maxBalanceFactor}
     {
     }
@@ -105,39 +125,60 @@ public:
     }
 
     void insertNode(const T& data, std::string label="");
+
     void insertNode(const std::vector<T>& list, std::vector<std::string> labels=std::vector<std::string>());
-    void deleteNodes(const T& data);
+
+    void deleteNode(const T& data);
+
     void setRotationLength(const std::size_t rotationLength);
+
     void clear(){ _deleteTree(m_root); }
+
     std::size_t findNodes(const T& data);
+
     int getHeight() const { return m_root->m_height; };
     std::vector<T> getSequence();
+
     void printTree();
 
     virtual ~BinarySearchTree(){ _deleteTree(m_root); }
 
 protected:
     void _insertNode(Node<T>*& node, const T& data, int depth, std::string label);
+
     Node<T>* _deleteNode(Node<T>* node, const T& data);
+
     Node<T>* _deleteNodes(Node<T>* node, const T& data);
+
     void _deleteTree(Node<T>*& node);
+
     Node<T>* _getNode(const T& data);
+
     bool _isUnbalanced(Node<T>* node);
+
     void _fillRotationPointers();
+
     void _rotate();
-    void _rotate13();
+
+    void _rotateAVL();
+
     void _rotate1(Node<T>* parentNode, Node<T>* node, SenseType sense);
+
     int _getNodeHeight(Node<T>* node){ return (node == nullptr) ? -1 : node->m_height; };
+
     int _getBalanceFactor(Node<T>* node){ return _getNodeHeight(node->left)-_getNodeHeight(node->right); };
+
     void _updateNodeHeight(Node<T>* node);
+
     void _setNodeHeight(Node<T>* node, int heightL, int heightR);
+
     void _updateHeight(Node<T>* node);
+
     void _updateDepth(Node<T>* node, int depth);
+
     void _printNode(Node<T>*& node, int x, int y);
 
 };
-
-
 
 #include "Bst.cpp"
 

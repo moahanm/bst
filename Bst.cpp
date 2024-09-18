@@ -66,7 +66,7 @@ void BinarySearchTree<T>::_insertNode(Node<T>*& node, const T& data, int depth, 
 
 // Delete all nodes with data 'data'
 template<typename T>
-void BinarySearchTree<T>::deleteNodes(const T& data)
+void BinarySearchTree<T>::deleteNode(const T& data)
 {
     if (m_maxBalanceFactor>0)
     {
@@ -404,7 +404,7 @@ void BinarySearchTree<T>::_rotate()
 }
 
 template<typename T>
-void BinarySearchTree<T>::_rotate13()
+void BinarySearchTree<T>::_rotateAVL()
 {
     if (m_ptrRotHead != nullptr)
     {
@@ -558,7 +558,7 @@ void BinarySearchTree<T>::printTree()
         _updateDepth(m_root, 0);
 
         int nlines{ m_root->m_height + 1 };
-        int pWidth{2};
+        int pWidth{ 2 };
         for (int i{0}; i<nlines-1; i++)
             pWidth *= 2;
         pWidth -= 1;

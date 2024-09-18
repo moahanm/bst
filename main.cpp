@@ -4,15 +4,30 @@
 #include <iostream>
 #include <iomanip>
 #include "Point2d.h"
-#include "../Random.h"
+#include "Random.h"
 #include <string>
-#include "../Timer.h"
+#include "Timer.h"
 #include <vector>
 
 int main()
 {
     {
-    // 1-3 rotation test on Custom object
+    std::cout << "1-3 rotation test (AVL):\n";
+    BinarySearchTree<int> bst{1};
+    bst.setRotationLength(3);
+    bst.insertNode({40,20,10,25,30,22,50}, {"040","020","010","025","030","022","050"});
+    bst.printTree();
+    /* answer
+             025
+
+       020         040
+
+    010   022   030   050
+    */
+    }
+
+    {
+    std::cout << "1-3 rotation test on Custom object:\n";
     BinarySearchTree<Point2d> bst{1};
     bst.insertNode(Point2d(4.,4.), "(4,4)");
     bst.insertNode(Point2d(2.,2.), "(2,2)");
@@ -24,77 +39,70 @@ int main()
     bst.printTree();
     }
 
-
     // {
-    // // 1-3 rotation test
+    // std::cout <<  "1-3 deletion test (AVL):\n";
     // BinarySearchTree<int> bst{1};
-    // bst.setRotationLength(3);
-    // bst.insertNode({40,20,10,25,30,22,50}, {"040","020","010","025","030","0022","050"});
+    // bst.insertNode({2,5,1,4,5,6,7,5,4,3,3}, {"2","5","1","4","5","6","7","5","4","3","3"});
+    // std::cout << "Before:\n";
+    // bst.printTree();
+    // bst.deleteNode(5);
+    // std::cout << "After deletion (5):\n";
     // bst.printTree();
     // /* answer
-    //          025
+    //        5       
 
-    //    020         040
+    //    3       6   
 
-    // 010   022   030   050
+    //  2   4   5   7 
+
+    // 1   3 4   5
+
+    // then
+    //        4       
+
+    //    3       6   
+
+    //  2   3       7 
+
+    // 1     4
     // */
     // }
 
-
-    // bst.insertNode(2);
-    // bst.insertNode(5);
-    // bst.insertNode(1);
-    // bst.insertNode(4);
-    // bst.insertNode(5);
-    // bst.insertNode(6);
-    // bst.insertNode(7);
-    // bst.insertNode(5);
-    // bst.insertNode(4);
-    // bst.insertNode(3);
-    // bst.insertNode(3);
-
-
-    // for delete rotation
-    // bst.insertNode(0);
-    // bst.insertNode(-4);
-    // bst.insertNode(4);
-    // bst.insertNode(-6);
-    // bst.insertNode(-3);
-    // bst.insertNode(6);
-    // bst.insertNode(-8);
-
     // {
-    // for 2nd order rotations
+    // std::cout << "2-3 rotation tests:\n";
     // BinarySearchTree<int> bst{2};
-    // bst.insertNode({90,70,50,30});
+    // bst.insertNode({90,70,50,30},{"90","70","50","30"});
+    // bst.insertNode(10,"10");
     // bst.printTree();
-    // bst.insertNode(10);
-    // bst.printTree();
+    // /* answer
+    //               70              
+
+    //       50              90      
+
+    //   30                          
+
+    // 10
+    // */
 
     // bst.clear();
-    // bst.insertNode({10,30,50,70});
+    // bst.insertNode({40,20,10,25,30,22,50,28,27},{"40","20","10","25","30","22","50","28","27"});
     // bst.printTree();
-    // bst.insertNode(90);
-    // bst.printTree();
+    // /* answer
+    //                               25                              
+
+    //               20                              40              
+
+    //       10              22              30              50      
+
+    //                                    28                          
+
+    //                                  27
+    // */
 
     // bst.clear();
-    // bst.insertNode({90,70,50,30});
+    // bst.insertNode({40,20,10,25,30}, {"040","020","010","025","030"});
     // bst.printTree();
-    // bst.insertNode(40);
-    // bst.printTree();
-
-    // bst.clear();
-    // bst.insertNode({40,20,10,25,30,22,50,28,27});
-    // bst.printTree();
-    // }
-
-    // {
-    // 2-3 rotation test
-    // BinarySearchTree<int> bst{2};
-    // bst.setRotationLength(3);
-    // bst.insertNode({40,20,10,25,30});
-    // bst.printTree();
-    // bst.insertNode({22,28});
+    // bst.insertNode({22,28}, {"022","028"});
     // bst.printTree();
     /* answer
              025         
@@ -116,27 +124,26 @@ int main()
     // }
 
     // {
-    // 3-3 rotation test
+    // std::cout << "3-3 rotation test:\n";
     // BinarySearchTree<int> bst{3};
-    // bst.setRotationLength(3);
-    // bst.insertNode({40,20,10,25,30,22,28});
+    // bst.insertNode({40,20,10,25,30,22,28}, {"040","020","010","025","030","022","028"});
     // bst.printTree();
-    /* answer
-                     025                     
+    // /* answer
+    //                  025                     
 
-          020                     040         
+    //       020                     040         
 
-    010         022         030               
+    // 010         022         030               
 
-                         028
-    */
+    //                      028
+    // */
     // }
 
     // {
-    // 3-4 rotation test
+    // std::cout << "3-4 rotation test:\n";
     // BinarySearchTree<int> bst{3};
     // bst.setRotationLength(4);
-    // bst.insertNode({40,20,10,25,30,22,28});
+    // bst.insertNode({40,20,10,25,30,22,28}, {"040","020","010","025","030","022","028"});
     // bst.printTree();
     /* answer
              025         
@@ -148,19 +155,11 @@ int main()
     */
     // }
 
-    // std::cout << "NUMBER OF 5s: " << bst.findNodes(5) << '\n';
-
-    // // std::cout << "BEFORE:\n";
-    // bst.printTree();
-
-    // bst.deleteNodes(5);
-
-    // std::cout << "AFTER deleting 5:\n";
-    // bst.printTree();
-
-    /*
+    
     const int nNodes{100000};
-    const int Nave{100};
+    const int Nave{500};
+
+    std::cout << "\nSpeed-test for insertion and finding with " << nNodes << " integers with " << Nave << " values for time averaging in seconds.\n\n";
     Timer tictoc;
     std::vector<int> numbersToFind{};
     for (int k{0}; k<Nave; k++)
@@ -196,7 +195,10 @@ int main()
     std::cout << "log( " << nNodes << " ) = " << std::log(nNodes) << '\n';
     for (std::size_t bf{0}; bf<vecMaxBF.size(); bf++)
     {
-        std::cout << "MaxBalFac: " << vecMaxBF[bf] << " HEIGHT: " << vecHeight[bf] << " INSERT: " << vecTimeInsert[bf] << ", " << vecTimeInsert1[bf] << "(1) FIND: " << vecTimeFind[bf] << '\n';
+        std::cout << "MaxBalFac: " << vecMaxBF[bf] << " HEIGHT: " << vecHeight[bf] << " INSERT: " << vecTimeInsert[bf] << ", " << vecTimeInsert1[bf] << "(1) FIND: " << vecTimeFind[bf] << "(1)";
+        if (vecMaxBF[bf] == 1)
+            std::cout << " (AVL)";
+        std::cout << '\n';
     }
 
     std::cout << "\n\n";
@@ -231,7 +233,7 @@ int main()
     std::cout << "log( " << nNodes << " ) = " << std::log(nNodes) << '\n';
     for (std::size_t rl{0}; rl<vecRotLen.size(); rl++)
     {
-        std::cout << "RotLen: " << vecRotLen[rl] << " HEIGHT: " << vecHeight[rl] << " INSERT: " << vecTimeInsert[rl] << ", " << vecTimeInsert1[rl] << "(1) FIND: " << vecTimeFind[rl] << '\n';
+        std::cout << "RotLen: " << vecRotLen[rl] << " HEIGHT: " << vecHeight[rl] << " INSERT: " << vecTimeInsert[rl] << ", " << vecTimeInsert1[rl] << "(1) FIND: " << vecTimeFind[rl] << "(1) \n";
     }
 
     std::cout << "\n\n";
@@ -258,8 +260,8 @@ int main()
         auto it = std::lower_bound(vecList.begin(),vecList.end(),numbersToFind[k]);
     double timeFind{tictoc.elapsed()/Nave};
 
-    std::cout << "INSERT: " << timeInsert << ", " << timeInsert1 << "(1) FIND: " << timeFind << '\n';
-
-    */
+    std::cout << "INSERT: " << timeInsert << ", " << timeInsert1 << "(1) FIND: " << timeFind << "(1) \n";
+    
+    
     return 0;
 }
