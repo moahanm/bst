@@ -35,7 +35,7 @@ int main()
 
     {
     std::cout << "1-3 rotation test on Custom object:\n";
-    BinarySearchTree<Point2d> bst{1};
+    BinarySearchTree<Point2d> bst{};
     bst.insertNode(Point2d(4.,4.), "(4,4)");
     bst.insertNode(Point2d(2.,2.), "(2,2)");
     bst.insertNode(Point2d(1.,1.), "(1,1)");
@@ -43,6 +43,13 @@ int main()
     bst.insertNode(Point2d(3.,3.), "(3,3)");
     bst.insertNode(Point2d(2.2,2.2), "(2.2,2.2)");
     bst.insertNode(Point2d(5.,5.), "(5,5)");
+    bst.printTree();
+    }
+
+    {
+    std::cout << "string partial template specification test:\n";
+    BinarySearchTree<std::string> bst{};
+    bst.insertNode({"Alice", "Bob", "Charlie"});
     bst.printTree();
     }
 

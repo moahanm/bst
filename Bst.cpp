@@ -58,9 +58,43 @@ void BinarySearchTree<T>::_insertNode(Node<T>*& node, const T& data, int depth, 
     }
     else
     {
-        node = new Node{data, depth, label};
         if (label.size() > printSpace)
             printSpace = label.size();
+        node = new Node{data, depth, label};
+    }
+}
+
+template<>
+void BinarySearchTree<std::string>::_insertNode(Node<std::string>*& node, const std::string& data, int depth, std::string label)
+{
+    if (node != nullptr)
+    {
+        if (data < node->m_data)
+        {
+            _insertNode(node->left, data, depth+1, label);
+        }
+        else
+            _insertNode(node->right, data, depth+1, label);
+
+        int lh = _getNodeHeight(node->left);
+        int rh = _getNodeHeight(node->right);
+        node->m_height = std::max(lh,rh) + 1;
+
+        if (m_ptrRotHead == nullptr)
+        {
+            if (_isUnbalanced(node))
+                m_ptrRotHead = node;
+        }
+        else if (m_ptrParent == nullptr)
+            m_ptrParent = node;
+    }
+    else
+    {
+        if (label.size() == 0)
+            label = data;
+        if (label.size() > printSpace)
+            printSpace = label.size();
+        node = new Node{data, depth, label};
     }
 }
 
