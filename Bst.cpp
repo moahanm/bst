@@ -250,43 +250,6 @@ void BinarySearchTree<T>::_deleteTree(Node<T>*& node)
 }
 
 template<typename T>
-Node<T>* BinarySearchTree<T>::_getNode(const T& data)
-{
-    if (m_root != nullptr)
-    {
-        Node<T>* node{ m_root };
-
-        while (true)
-        {
-            if (*node == data)
-            {
-                return node;
-            }
-            else if (*node < data)
-            {
-                if (node->right != nullptr)
-                {
-                    node = node->right;
-                }
-                else
-                    return nullptr;
-            }
-            else
-            {
-                if (node->left != nullptr)
-                {
-                    node = node->left;
-                }
-                else
-                    return nullptr;
-            }
-        }
-    }
-    else
-        return nullptr;
-}
-
-template<typename T>
 bool BinarySearchTree<T>::_isUnbalanced(Node<T>* node)
 {
     if (node != nullptr)

@@ -32,10 +32,11 @@ m_rotationLength = 3                                m_rotationLength = 5
 template<typename T>
 class BinarySearchTree;
 
+
 template<typename T>
 class Node
 {
-private:
+public:
     T m_data;   // no default constructor assumed
     Node* left{ nullptr };
     Node* right{ nullptr };
@@ -43,17 +44,22 @@ private:
     int m_depth{0};
     std::string m_label{""};    // for printing
 
+
+private:
     Node(const T& data, int depth, std::string label=""): m_data{data}, m_depth{depth}, m_label{label}
     {
     }
 
-    T& getData(){ return m_data; }
+    Node() = delete;
 
+public:
     void copyNode(const Node* node)
     {
         m_data = node->m_data;
         m_label = node->m_label;
     }
+
+    void setLabel(std::string label){ m_label = label; }
 
     Node* findMin()
     {
@@ -75,6 +81,10 @@ private:
 
     bool operator<(const T& data) const { return m_data < data; }
 
+    virtual ~Node()
+    {
+    }
+
     friend class BinarySearchTree<T>;
 };
 
@@ -82,7 +92,7 @@ private:
 template<typename T>
 class BinarySearchTree
 {
-private:
+protected:
     enum SenseType
     {
         left,
@@ -151,8 +161,6 @@ protected:
     Node<T>* _deleteNodes(Node<T>* node, const T& data);
 
     void _deleteTree(Node<T>*& node);
-
-    Node<T>* _getNode(const T& data);
 
     bool _isUnbalanced(Node<T>* node);
 
