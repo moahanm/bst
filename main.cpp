@@ -9,22 +9,29 @@
 #include "Timer.h"
 #include <vector>
 
+/*
+To compile:
+
+g++ main.cpp -o bst
+
+*/
+
 int main()
 {
-    {
-    std::cout << "1-3 rotation test (AVL):\n";
-    BinarySearchTree<int> bst{1};
-    bst.setRotationLength(3);
-    bst.insertNode({40,20,10,25,30,22,50}, {"040","020","010","025","030","022","050"});
-    bst.printTree();
-    /* answer
-             025
+    // {
+    // std::cout << "1-3 rotation test (AVL):\n";
+    // BinarySearchTree<int> bst{1};
+    // bst.setRotationLength(3);
+    // bst.insertNode({40,20,10,25,30,22,50}, {"040","020","010","025","030","022","050"});
+    // bst.printTree();
+    // /* answer
+    //          025
 
-       020         040
+    //    020         040
 
-    010   022   030   050
-    */
-    }
+    // 010   022   030   050
+    // */
+    // }
 
     {
     std::cout << "1-3 rotation test on Custom object:\n";
@@ -104,24 +111,39 @@ int main()
     // bst.printTree();
     // bst.insertNode({22,28}, {"022","028"});
     // bst.printTree();
-    /* answer
-             025         
+    // /* answer
+    //          025         
 
-       020         040   
+    //    020         040   
 
-    010         030
+    // 010         030
     
-    then
-                     025                     
+    // then
+    //                  025                     
 
-          020                     040         
+    //       020                     040         
 
-    010         022         030               
+    // 010         022         030               
 
-                         028
+    //                      028
 
-    */
+    // */
     // }
+
+    {
+    std::cout << "2-5 rotation tests:\n";
+    BinarySearchTree<int> bst{2};
+    bst.setRotationLength(5);
+    bst.insertNode({90,70,50,30,10},{"90","70","50","30","10"});
+    bst.printTree();
+    /* answer
+            50      
+
+        30      70  
+
+      10          90
+    */
+    }
 
     // {
     // std::cout << "3-3 rotation test:\n";
@@ -156,8 +178,9 @@ int main()
     // }
 
     
+    
     const int nNodes{100000};
-    const int Nave{500};
+    const int Nave{100};
 
     std::cout << "\nSpeed-test for insertion and finding with " << nNodes << " integers with " << Nave << " values for time averaging in seconds.\n\n";
     Timer tictoc;
