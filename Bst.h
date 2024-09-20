@@ -33,19 +33,20 @@ m_rotationLength = 3                                m_rotationLength = 5
 template<typename T>
 class BinarySearchTree
 {
-using ElementPointer = typename DLList<T>::Element*;
-private:
+using Element = typename DLList<T>::Element;
+
+protected:
     class Node
     {
     public:
-        ElementPointer m_elementPointer;   // no default constructor assumed
+        Element* m_elementPointer;   // no default constructor assumed
         Node* left{ nullptr };
         Node* right{ nullptr };
         int m_height{ 0 };
         int m_depth{ 0 };
         std::string m_label{ "" };    // for printing
 
-        Node(ElementPointer elementPointer, int depth, std::string label=""):
+        Node(Element* elementPointer, int depth, std::string label=""):
         m_elementPointer{ elementPointer }, m_depth{ depth }, m_label{ label }
         {
         }
@@ -79,7 +80,6 @@ private:
         }
     };
 
-protected:
     enum SenseType
     {
         left,

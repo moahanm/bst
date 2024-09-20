@@ -16,6 +16,7 @@ template<typename T, typename U>
 class Dictionary;
 
 
+// KeyValuePair must be declared external to Dictionary as BinarySearchTree needs this type
 template<typename T, typename U>
 class KeyValuePair
 {
@@ -52,6 +53,8 @@ public:
 template<typename T, typename U>
 class Dictionary : public BinarySearchTree<KeyValuePair<T,U>>
 {
+using Node = typename BinarySearchTree<KeyValuePair<T,U>>::Node;
+
 public:
     Dictionary(): BinarySearchTree<KeyValuePair<T,U>>()
     {
@@ -65,10 +68,10 @@ public:
 
     U& operator[](const T& key)
     {
-        Node<KeyValuePair<T,U>>* node{ _getNode(key) };
+        Node* node{ _getNode(key) };
         if (node != nullptr)
         {
-            return node->m_data.second;
+            return node->m_elementPointer->data->second;
         }
         else
             throw std::runtime_error("Key not found");
@@ -79,7 +82,7 @@ public:
     }
 
 private:
-    Node<KeyValuePair<T,U>>* _getNode(const T& key);
+    Node* _getNode(const T& key);
 
 };
 

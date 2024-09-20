@@ -1,6 +1,6 @@
 #include "Bst.h"
 #include <chrono>
-// #include "Dictionary.h"
+#include "Dictionary.h"
 #include <iostream>
 #include <iomanip>
 #include "Point2d.h"
@@ -162,7 +162,7 @@ int main()
     // }
 
     
-    
+    /*
     const int nNodes{100000};
     const int Nave{100};
 
@@ -270,25 +270,25 @@ int main()
     std::cout << "INSERT: " << timeInsert << ", " << timeInsert1 << "(1) FIND: " << timeFind << "(1) \n";
     
     std::cout << "\n\n";
-    
+    */
 
-    // {
-    // std::cout << "Using BST as a dictionary:\n";
-    // Dictionary<std::string,Point2d> dict{};
-    // dict.emplace("Alice", Point2d(3.,3.));
-    // dict.emplace("Bob", Point2d(2.,2.));
-    // dict.emplace("Charlie", Point2d(1.,1.));
-    // dict.emplace("Dan", Point2d(5.,5.));
-    // dict["Alice"]++;
-    // dict["Bob"] = Point2d(2.5,2.5);
-    // dict.emplace("Charlie", Point2d(0.,0.));
-    // dict.erase("Dan");
-    // std::cout << "Alice: " << dict["Alice"] << '\n';
-    // std::cout << "Bob: " << dict["Bob"] << '\n';
-    // std::cout << "Charlie: " << dict["Charlie"] << '\n';
-    // std::cout << dict.contains("Dan") << '\n';
-    // dict.printTree();
-    // }
+    {
+    std::cout << "Using BST as a dictionary:\n";
+    Dictionary<std::string,Point2d> dict{};
+    dict.emplace("Alice", Point2d(3.,3.));
+    dict.emplace("Bob", Point2d(2.,2.));
+    dict.emplace("Charlie", Point2d(1.,1.));
+    dict.emplace("Dan", Point2d(5.,5.));
+    dict["Alice"]++;
+    dict["Bob"] = Point2d(2.5,2.5);
+    dict.emplace("Charlie", Point2d(0.,0.));
+    dict.erase("Dan");
+    std::cout << "Alice: " << dict["Alice"] << '\n';
+    std::cout << "Bob: " << dict["Bob"] << '\n';
+    std::cout << "Charlie: " << dict["Charlie"] << '\n';
+    std::cout << dict.contains("Dan") << '\n';
+    dict.printTree();
+    }
     
     return 0;
 }
