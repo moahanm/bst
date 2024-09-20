@@ -1,6 +1,7 @@
 #ifndef BST_H
 #define BST_H
 
+#include "DLList.h"
 #include <string>
 #include <vector>
 
@@ -30,68 +31,54 @@ m_rotationLength = 3                                m_rotationLength = 5
 */
 
 template<typename T>
-class BinarySearchTree;
-
-
-template<typename T>
-class Node
-{
-public:
-    T m_data;   // no default constructor assumed
-    Node* left{ nullptr };
-    Node* right{ nullptr };
-    int m_height{0};
-    int m_depth{0};
-    std::string m_label{""};    // for printing
-
-
-private:
-    Node(const T& data, int depth, std::string label=""): m_data{data}, m_depth{depth}, m_label{label}
-    {
-    }
-
-    Node() = delete;
-
-public:
-    void copyNode(const Node* node)
-    {
-        m_data = node->m_data;
-        m_label = node->m_label;
-    }
-
-    void setLabel(std::string label){ m_label = label; }
-
-    Node* findMin()
-    {
-        Node* ptr{ this };
-        while (ptr->left != nullptr)
-            ptr = ptr->left;
-        return ptr;
-    }
-
-    Node* findMax()
-    {
-        Node* ptr{ this };
-        while (ptr->right != nullptr)
-            ptr = ptr->right;
-        return ptr;
-    }
-
-    bool operator==(const T& data) const { return m_data == data; }
-
-    bool operator<(const T& data) const { return m_data < data; }
-
-    virtual ~Node()
-    {
-    }
-
-    friend class BinarySearchTree<T>;
-};
-
-
-template<typename T>
 class BinarySearchTree
 {
+using ElementPointer = typename DLList<T>::Element*;
+private:
+    class Node
+    {
+    public:
+        ElementPointer m_elementPointer;   // no default constructor assumed
+        Node* left{ nullptr };
+        Node* right{ nullptr };
+        int m_height{ 0 };
+        int m_depth{ 0 };
+        std::string m_label{ "" };    // for printing
+
+        Node(ElementPointer elementPointer, int depth, std::string label=""):
+        m_elementPointer{ elementPointer }, m_depth{ depth }, m_label{ label }
+        {
+        }
+
+        Node() = delete;
+
+        void setLabel(std::string label){ m_label = label; }
+
+        Node* findMin()
+        {
+            Node* ptr{ this };
+            while (ptr->left != nullptr)
+                ptr = ptr->left;
+            return ptr;
+        }
+
+        Node* findMax()
+        {
+            Node* ptr{ this };
+            while (ptr->right != nullptr)
+                ptr = ptr->right;
+            return ptr;
+        }
+
+        bool operator==(const T& data) const { return *(m_elementPointer->data) == data; }
+
+        bool operator<(const T& data) const { return *(m_elementPointer->data) < data; }
+
+        virtual ~Node()
+        {
+        }
+    };
+
 protected:
     enum SenseType
     {
@@ -99,14 +86,16 @@ protected:
         right
     };
 
-    Node<T>* m_root{ nullptr };
+    DLList<T> m_elements;
+
+    Node* m_root{ nullptr };
     std::size_t m_maxBalanceFactor{ 1 };
     std::size_t m_rotationLength{ 3 };
 
     // rotation
-    Node<T>* m_ptrParent{ nullptr };
-    Node<T>* m_ptrRotHead{ nullptr };
-    std::vector<Node<T>*> m_ptrRots{};
+    Node* m_ptrParent{ nullptr };
+    Node* m_ptrRotHead{ nullptr };
+    std::vector<Node*> m_ptrRots{};
 
     // printing
     std::size_t printSpace{ 1 };
@@ -154,15 +143,21 @@ public:
     virtual ~BinarySearchTree(){ _deleteTree(m_root); }
 
 protected:
-    void _insertNode(Node<T>*& node, const T& data, int depth, std::string label);
+    void _insertNode(Node*& node, const T& data, int depth, std::string label);
 
-    Node<T>* _deleteNode(Node<T>* node, const T& data);
+    Node* _createNode(const T& data, int depth, std::string label);
 
-    Node<T>* _deleteNodes(Node<T>* node, const T& data);
+    Node* _deleteNode(Node* node, const T& data);
 
-    void _deleteTree(Node<T>*& node);
+    Node* _deleteNodes(Node* node, const T& data);
 
-    bool _isUnbalanced(Node<T>* node);
+    void _deleteTree(Node*& node);
+
+    void _copyNode(Node* nodeReference, Node* nodeTarget);
+
+    void _freeNode(Node*& node);
+
+    bool _isUnbalanced(Node* node);
 
     void _fillRotationPointers();
 
@@ -170,21 +165,21 @@ protected:
 
     void _rotateAVL();
 
-    void _rotate1(Node<T>* parentNode, Node<T>* node, SenseType sense);
+    void _rotate1(Node* parentNode, Node* node, SenseType sense);
 
-    int _getNodeHeight(Node<T>* node){ return (node == nullptr) ? -1 : node->m_height; };
+    int _getNodeHeight(Node* node){ return (node == nullptr) ? -1 : node->m_height; };
 
-    int _getBalanceFactor(Node<T>* node){ return _getNodeHeight(node->left)-_getNodeHeight(node->right); };
+    int _getBalanceFactor(Node* node){ return _getNodeHeight(node->left)-_getNodeHeight(node->right); };
 
-    void _updateNodeHeight(Node<T>* node);
+    void _updateNodeHeight(Node* node);
 
-    void _setNodeHeight(Node<T>* node, int heightL, int heightR);
+    void _setNodeHeight(Node* node, int heightL, int heightR);
 
-    void _updateHeight(Node<T>* node);
+    void _updateHeight(Node* node);
 
-    void _updateDepth(Node<T>* node, int depth);
+    void _updateDepth(Node* node, int depth);
 
-    void _printNode(Node<T>*& node, int x, int y);
+    void _printNode(Node*& node, int x, int y);
 
 };
 

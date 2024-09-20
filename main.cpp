@@ -1,6 +1,6 @@
 #include "Bst.h"
 #include <chrono>
-#include "Dictionary.h"
+// #include "Dictionary.h"
 #include <iostream>
 #include <iomanip>
 #include "Point2d.h"
@@ -33,25 +33,25 @@ int main()
     // */
     // }
 
-    {
-    std::cout << "1-3 rotation test on Custom object:\n";
-    BinarySearchTree<Point2d> bst{};
-    bst.insertNode(Point2d(4.,4.), "(4,4)");
-    bst.insertNode(Point2d(2.,2.), "(2,2)");
-    bst.insertNode(Point2d(1.,1.), "(1,1)");
-    bst.insertNode(Point2d(2.5,2.5), "(2.5,2.5)");
-    bst.insertNode(Point2d(3.,3.), "(3,3)");
-    bst.insertNode(Point2d(2.2,2.2), "(2.2,2.2)");
-    bst.insertNode(Point2d(5.,5.), "(5,5)");
-    bst.printTree();
-    }
+    // {
+    // std::cout << "1-3 rotation test on Custom object:\n";
+    // BinarySearchTree<Point2d> bst{};
+    // bst.insertNode(Point2d(4.,4.), "(4,4)");
+    // bst.insertNode(Point2d(2.,2.), "(2,2)");
+    // bst.insertNode(Point2d(1.,1.), "(1,1)");
+    // bst.insertNode(Point2d(2.5,2.5), "(2.5,2.5)");
+    // bst.insertNode(Point2d(3.,3.), "(3,3)");
+    // bst.insertNode(Point2d(2.2,2.2), "(2.2,2.2)");
+    // bst.insertNode(Point2d(5.,5.), "(5,5)");
+    // bst.printTree();
+    // }
 
-    {
-    std::cout << "string template specification test:\n";
-    BinarySearchTree<std::string> bst{};
-    bst.insertNode({"Alice", "Bob", "Charlie"});
-    bst.printTree();
-    }
+    // {
+    // std::cout << "string template specification test:\n";
+    // BinarySearchTree<std::string> bst{};
+    // bst.insertNode({"Alice", "Bob", "Charlie"});
+    // bst.printTree();
+    // }
 
     // {
     // std::cout <<  "1-3 deletion test (AVL):\n";
@@ -112,45 +112,22 @@ int main()
 
     //                                  27
     // */
-
-    // bst.clear();
-    // bst.insertNode({40,20,10,25,30}, {"040","020","010","025","030"});
-    // bst.printTree();
-    // bst.insertNode({22,28}, {"022","028"});
-    // bst.printTree();
-    // /* answer
-    //          025         
-
-    //    020         040   
-
-    // 010         030
-    
-    // then
-    //                  025                     
-
-    //       020                     040         
-
-    // 010         022         030               
-
-    //                      028
-
-    // */
     // }
 
-    {
-    std::cout << "2-5 rotation tests:\n";
-    BinarySearchTree<int> bst{2};
-    bst.setRotationLength(5);
-    bst.insertNode({90,70,50,30,10},{"90","70","50","30","10"});
-    bst.printTree();
-    /* answer
-            50      
+    // {
+    // std::cout << "2-5 rotation tests:\n";
+    // BinarySearchTree<int> bst{2};
+    // bst.setRotationLength(5);
+    // bst.insertNode({90,70,50,30,10},{"90","70","50","30","10"});
+    // bst.printTree();
+    // /* answer
+    //         50      
 
-        30      70  
+    //     30      70  
 
-      10          90
-    */
-    }
+    //   10          90
+    // */
+    // }
 
     // {
     // std::cout << "3-3 rotation test:\n";
@@ -174,14 +151,14 @@ int main()
     // bst.setRotationLength(4);
     // bst.insertNode({40,20,10,25,30,22,28}, {"040","020","010","025","030","022","028"});
     // bst.printTree();
-    /* answer
-             025         
+    // /* answer
+    //          025         
 
-       020         030   
+    //    020         030   
 
-    010   022   028   040
+    // 010   022   028   040
     
-    */
+    // */
     // }
 
     
@@ -293,26 +270,25 @@ int main()
     std::cout << "INSERT: " << timeInsert << ", " << timeInsert1 << "(1) FIND: " << timeFind << "(1) \n";
     
     std::cout << "\n\n";
+    
 
-    {
-    std::cout << "Using BST as a dictionary:\n";
-    Dictionary<std::string,Point2d> dict{};
-    dict.emplace("Alice", Point2d(3.,3.));
-    dict.emplace("Bob", Point2d(2.,2.));
-    dict.emplace("Charlie", Point2d(1.,1.));
-    dict.emplace("Dan", Point2d(5.,5.));
-    dict["Alice"]++;
-    dict["Bob"] = Point2d(2.5,2.5);
-    dict.emplace("Charlie", Point2d(0.,0.));
-    dict.erase("Dan");
-    std::cout << "Alice: " << dict["Alice"] << '\n';
-    std::cout << "Bob: " << dict["Bob"] << '\n';
-    std::cout << "Charlie: " << dict["Charlie"] << '\n';
-    std::cout << dict.contains("Dan") << '\n';
-    dict.printTree();
-
-
-    }
+    // {
+    // std::cout << "Using BST as a dictionary:\n";
+    // Dictionary<std::string,Point2d> dict{};
+    // dict.emplace("Alice", Point2d(3.,3.));
+    // dict.emplace("Bob", Point2d(2.,2.));
+    // dict.emplace("Charlie", Point2d(1.,1.));
+    // dict.emplace("Dan", Point2d(5.,5.));
+    // dict["Alice"]++;
+    // dict["Bob"] = Point2d(2.5,2.5);
+    // dict.emplace("Charlie", Point2d(0.,0.));
+    // dict.erase("Dan");
+    // std::cout << "Alice: " << dict["Alice"] << '\n';
+    // std::cout << "Bob: " << dict["Bob"] << '\n';
+    // std::cout << "Charlie: " << dict["Charlie"] << '\n';
+    // std::cout << dict.contains("Dan") << '\n';
+    // dict.printTree();
+    // }
     
     return 0;
 }
