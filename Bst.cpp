@@ -149,8 +149,8 @@ typename BinarySearchTree<T>::Node* BinarySearchTree<T>::_deleteNode(Node* node,
             }
             else
             {
-                _copyNode(node->left->findMax(), node); // no duplicates guaranteed in left subtree
-                node->left = _deleteNode(node->left, *(node->m_elementPointer->data));
+                _copyNode(_findMaxFrom(node->left), node); // no duplicates guaranteed in left subtree
+                node->left = _deleteNode(node->left, *(node->m_elementPointer->dataPointer));
                 // no change in depth
             }
         }
@@ -212,8 +212,8 @@ typename BinarySearchTree<T>::Node* BinarySearchTree<T>::_deleteNodes(Node* node
             }
             else
             {
-                _copyNode(node->left->findMax(), node); // no duplicates guaranteed in left subtree
-                node->left = _deleteNode(node->left, *(node->m_elementPointer->data));
+                _copyNode(_findMaxFrom(node->left), node); // no duplicates guaranteed in left subtree
+                node->left = _deleteNode(node->left, *(node->m_elementPointer->dataPointer));
                 // no change in depth
             }
         }
@@ -259,7 +259,7 @@ template<typename T>
 void BinarySearchTree<T>::_copyNode(Node* nodeReference, Node* nodeTarget)
 {
     m_elements.remove(nodeTarget->m_elementPointer);
-    nodeTarget->m_elementPointer = m_elements.push(*(nodeReference->m_elementPointer->data));
+    nodeTarget->m_elementPointer = m_elements.push(*(nodeReference->m_elementPointer->dataPointer));
     nodeTarget->m_label = nodeReference->m_label;
 }
 
@@ -283,7 +283,7 @@ bool BinarySearchTree<T>::_isUnbalanced(Node* node)
 }
 
 template<typename T>
-std::size_t BinarySearchTree<T>::findNodes(const T& data)
+std::size_t BinarySearchTree<T>::findNodes(const T& data) const
 {
     std::size_t ans{0};
 
@@ -422,6 +422,7 @@ void BinarySearchTree<T>::_rotate()
     m_ptrRotHead = nullptr;
 }
 
+// Just for reference
 template<typename T>
 void BinarySearchTree<T>::_rotateAVL()
 {
@@ -503,10 +504,19 @@ void BinarySearchTree<T>::_rotate1(Node* parentNode, Node* node, SenseType sense
 }
 
 template<typename T>
-void BinarySearchTree<T>::_setNodeHeight(Node* node, int heightL, int heightR)
+typename BinarySearchTree<T>::Node* BinarySearchTree<T>::_findMinFrom(Node* node)
 {
-    if (node != nullptr)
-        node->m_height = std::max(heightL,heightR) + 1;
+    while (node->left != nullptr)
+        node = node->left;
+    return node;
+}
+
+template<typename T>
+typename BinarySearchTree<T>::Node* BinarySearchTree<T>::_findMaxFrom(Node* node)
+{
+    while (node->right != nullptr)
+        node = node->right;
+    return node;
 }
 
 template<typename T>
@@ -517,18 +527,6 @@ void BinarySearchTree<T>::_updateNodeHeight(Node* node)
         int hL = _getNodeHeight(node->left);
         int hR = _getNodeHeight(node->right);
         node->m_height = std::max(hL,hR) + 1;
-    }
-}
-
-// Update height values for all nodes with root 'node' inclusive
-template<typename T>
-void BinarySearchTree<T>::_updateHeight(Node* node)
-{
-    if (node != nullptr)
-    {
-        _updateHeight(node->left);
-        _updateHeight(node->right);
-        _updateNodeHeight(node);
     }
 }
 
@@ -561,7 +559,7 @@ std::vector<T> BinarySearchTree<T>::getSequence()
             if (node->right != nullptr)
                 q.emplace(node->right);
 
-            ans.emplace_back(node->getData());
+            ans.emplace_back(*(node->m_elementPointer->dataPointer));
 
             q.pop();
         }

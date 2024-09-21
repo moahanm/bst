@@ -10,7 +10,7 @@ void Dictionary<T,U>::emplace(const T& key, const U& value, std::string label)
     Node* node{ _getNode(key) };
     if (node != nullptr)
     {
-        node->m_elementPointer->data->second = value;
+        node->m_elementPointer->dataPointer->second = value;
         node->setLabel(label);
     }
     else
@@ -23,7 +23,7 @@ void Dictionary<T,U>::erase(const T& key)
 {
     Node* node{ _getNode(key) };
     if (node != nullptr)
-        this->deleteNode(KeyValuePair<T,U>(key,node->m_elementPointer->data->second));
+        this->deleteNode(KeyValuePair<T,U>(key,node->m_elementPointer->dataPointer->second));
 }
 
 
@@ -36,11 +36,11 @@ typename BinarySearchTree<KeyValuePair<T,U>>::Node* Dictionary<T,U>::_getNode(co
 
         while (true)
         {
-            if (*(node->m_elementPointer->data) == key)
+            if (*(node->m_elementPointer->dataPointer) == key)
             {
                 return node;
             }
-            else if (*(node->m_elementPointer->data) < key)
+            else if (*(node->m_elementPointer->dataPointer) < key)
             {
                 if (node->right != nullptr)
                 {

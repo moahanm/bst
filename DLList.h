@@ -11,7 +11,7 @@ public:
 
     struct Element  // double linked list for element removal without search
     {
-        T* data{ nullptr };
+        T* dataPointer{ nullptr };
         Element* previous{ nullptr };
         Element* next{ nullptr };
     };
@@ -19,23 +19,23 @@ public:
     class Iterator  // create iterator class to deference Element returning the data itself
     {
     private:
-        Element* current;
+        Element* m_current;
     public:
-        Iterator(Element* ptr): current{ptr}
+        Iterator(Element* ptr): m_current{ptr}
         {
         }
-        T& operator*(){ return *(current->data); }
+        T& operator*(){ return *(m_current->dataPointer); }
         Iterator& operator++()
         {
-            current = current->next;
+            m_current = m_current->next;
             return *this;
         }
         Iterator& operator++(int)
         {
-            current = current->next;
+            m_current = m_current->next;
             return *this;
         }
-        bool operator!=(const Iterator& it) const { return current != it.current; }
+        bool operator!=(const Iterator& it) const { return m_current != it.m_current; }
     };
 
     DLList()
@@ -51,7 +51,7 @@ public:
     Element* push(const T& data)
     {
         Element* ele = new Element();   // new tail
-        tail->data = new T{data};
+        tail->dataPointer = new T{data};
         tail->next = ele;
         ele->previous = tail;
         tail = ele;
@@ -73,7 +73,7 @@ public:
                 head = ptr->next;
             }
 
-            delete ptr->data;
+            delete ptr->dataPointer;
             delete ptr;
         }
     }
@@ -86,7 +86,7 @@ public:
             ptr = head;
             head = head->next;
             head->previous = nullptr;
-            delete ptr->data;
+            delete ptr->dataPointer;
             delete ptr;
         }
         delete head;  // which is also tail

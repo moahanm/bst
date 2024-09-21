@@ -71,7 +71,7 @@ public:
         Node* node{ _getNode(key) };
         if (node != nullptr)
         {
-            return node->m_elementPointer->data->second;
+            return node->m_elementPointer->dataPointer->second;
         }
         else
             throw std::runtime_error("Key not found");

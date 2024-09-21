@@ -34,6 +34,7 @@ template<typename T>
 class BinarySearchTree
 {
 using Element = typename DLList<T>::Element;
+using Iterator = typename DLList<T>::Iterator;
 
 protected:
     class Node
@@ -42,8 +43,8 @@ protected:
         Element* m_elementPointer;   // no default constructor assumed
         Node* left{ nullptr };
         Node* right{ nullptr };
-        int m_height{ 0 };
-        int m_depth{ 0 };
+        int m_height{ 0 };  // for balance factor calculation
+        int m_depth{ 0 };   // for printing
         std::string m_label{ "" };    // for printing
 
         Node(Element* elementPointer, int depth, std::string label=""):
@@ -55,25 +56,9 @@ protected:
 
         void setLabel(std::string label){ m_label = label; }
 
-        Node* findMin()
-        {
-            Node* ptr{ this };
-            while (ptr->left != nullptr)
-                ptr = ptr->left;
-            return ptr;
-        }
+        bool operator==(const T& data) const { return *(m_elementPointer->dataPointer) == data; }
 
-        Node* findMax()
-        {
-            Node* ptr{ this };
-            while (ptr->right != nullptr)
-                ptr = ptr->right;
-            return ptr;
-        }
-
-        bool operator==(const T& data) const { return *(m_elementPointer->data) == data; }
-
-        bool operator<(const T& data) const { return *(m_elementPointer->data) < data; }
+        bool operator<(const T& data) const { return *(m_elementPointer->dataPointer) < data; }
 
         virtual ~Node()
         {
@@ -131,11 +116,16 @@ public:
 
     void setRotationLength(const std::size_t rotationLength);
 
+    Iterator begin(){ return m_elements.begin(); }
+
+    Iterator end(){ return m_elements.end(); }
+
     void clear(){ _deleteTree(m_root); }
 
-    std::size_t findNodes(const T& data);
+    std::size_t findNodes(const T& data) const;
+    
+    int getHeight() const { return m_root->m_height; }
 
-    int getHeight() const { return m_root->m_height; };
     std::vector<T> getSequence();
 
     void printTree();
@@ -167,15 +157,15 @@ protected:
 
     void _rotate1(Node* parentNode, Node* node, SenseType sense);
 
+    Node* _findMinFrom(Node *node);
+
+    Node* _findMaxFrom(Node *node);
+
     int _getNodeHeight(Node* node){ return (node == nullptr) ? -1 : node->m_height; };
 
     int _getBalanceFactor(Node* node){ return _getNodeHeight(node->left)-_getNodeHeight(node->right); };
 
     void _updateNodeHeight(Node* node);
-
-    void _setNodeHeight(Node* node, int heightL, int heightR);
-
-    void _updateHeight(Node* node);
 
     void _updateDepth(Node* node, int depth);
 

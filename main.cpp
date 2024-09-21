@@ -46,41 +46,34 @@ int main()
     // bst.printTree();
     // }
 
-    // {
-    // std::cout << "string template specification test:\n";
-    // BinarySearchTree<std::string> bst{};
-    // bst.insertNode({"Alice", "Bob", "Charlie"});
-    // bst.printTree();
-    // }
+    {
+    std::cout <<  "1-3 deletion test (AVL):\n";
+    BinarySearchTree<int> bst{1};
+    bst.insertNode({2,5,1,4,5,6,7,5,4,3,3}, {"2","5","1","4","5","6","7","5","4","3","3"});
+    std::cout << "Before:\n";
+    bst.printTree();
+    bst.deleteNode(5);
+    std::cout << "After deletion (5):\n";
+    bst.printTree();
+    /* answer
+           5       
 
-    // {
-    // std::cout <<  "1-3 deletion test (AVL):\n";
-    // BinarySearchTree<int> bst{1};
-    // bst.insertNode({2,5,1,4,5,6,7,5,4,3,3}, {"2","5","1","4","5","6","7","5","4","3","3"});
-    // std::cout << "Before:\n";
-    // bst.printTree();
-    // bst.deleteNode(5);
-    // std::cout << "After deletion (5):\n";
-    // bst.printTree();
-    // /* answer
-    //        5       
+       3       6   
 
-    //    3       6   
+     2   4   5   7 
 
-    //  2   4   5   7 
+    1   3 4   5
 
-    // 1   3 4   5
+    then
+           4       
 
-    // then
-    //        4       
+       3       6   
 
-    //    3       6   
+     2   3       7 
 
-    //  2   3       7 
-
-    // 1     4
-    // */
-    // }
+    1     4
+    */
+    }
 
     // {
     // std::cout << "2-3 rotation tests:\n";
@@ -114,20 +107,20 @@ int main()
     // */
     // }
 
-    // {
-    // std::cout << "2-5 rotation tests:\n";
-    // BinarySearchTree<int> bst{2};
-    // bst.setRotationLength(5);
-    // bst.insertNode({90,70,50,30,10},{"90","70","50","30","10"});
-    // bst.printTree();
-    // /* answer
-    //         50      
+    {
+    std::cout << "2-5 rotation tests:\n";
+    BinarySearchTree<int> bst{2};
+    bst.setRotationLength(5);
+    bst.insertNode({90,70,50,30,10},{"90","70","50","30","10"});
+    bst.printTree();
+    /* answer
+            50      
 
-    //     30      70  
+        30      70  
 
-    //   10          90
-    // */
-    // }
+      10          90
+    */
+    }
 
     // {
     // std::cout << "3-3 rotation test:\n";
@@ -162,7 +155,7 @@ int main()
     // }
 
     
-    /*
+    
     const int nNodes{100000};
     const int Nave{100};
 
@@ -270,7 +263,7 @@ int main()
     std::cout << "INSERT: " << timeInsert << ", " << timeInsert1 << "(1) FIND: " << timeFind << "(1) \n";
     
     std::cout << "\n\n";
-    */
+    
 
     {
     std::cout << "Using BST as a dictionary:\n";
@@ -283,9 +276,9 @@ int main()
     dict["Bob"] = Point2d(2.5,2.5);
     dict.emplace("Charlie", Point2d(0.,0.));
     dict.erase("Dan");
-    std::cout << "Alice: " << dict["Alice"] << '\n';
-    std::cout << "Bob: " << dict["Bob"] << '\n';
-    std::cout << "Charlie: " << dict["Charlie"] << '\n';
+    for (const auto it : dict)
+        std::cout << it.first << ", " << it.second << '\n';
+
     std::cout << dict.contains("Dan") << '\n';
     dict.printTree();
     }
