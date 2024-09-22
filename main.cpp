@@ -186,12 +186,12 @@ int main()
 
         tictoc.reset();
         for (int k{0}; k<Nave; k++)
-            bst.findNodes(numbersToFind[k]);
+            bst.find(numbersToFind[k]);
         vecTimeFind.push_back(tictoc.elapsed()/Nave);
 
         vecHeight.push_back(bst.getHeight());
     }
-    std::cout << "Binary Search Tree (rotation length = 3):\n";
+    std::cout << "Binary Search Tree (heap), rotation length = 3:\n";
     std::cout << "log( " << nNodes << " ) = " << std::log(nNodes) << '\n';
     for (std::size_t bf{0}; bf<vecMaxBF.size(); bf++)
     {
@@ -202,7 +202,7 @@ int main()
     }
 
     std::cout << "\n\n";
-
+    
     std::vector<std::size_t> vecRotLen{3,4,5,6,7};
     vecTimeInsert.clear();
     vecTimeInsert1.clear();
@@ -224,12 +224,12 @@ int main()
 
         tictoc.reset();
         for (int k{0}; k<Nave; k++)
-            bst.findNodes(numbersToFind[k]);
+            bst.find(numbersToFind[k]);
         vecTimeFind.push_back(tictoc.elapsed()/Nave);
 
         vecHeight.push_back(bst.getHeight());
     }
-    std::cout << "Binary Search Tree (max balance factor = 5):\n";
+    std::cout << "Binary Search Tree (heap), max balance factor = 5:\n";
     std::cout << "log( " << nNodes << " ) = " << std::log(nNodes) << '\n';
     for (std::size_t rl{0}; rl<vecRotLen.size(); rl++)
     {
@@ -238,7 +238,7 @@ int main()
 
     std::cout << "\n\n";
 
-    std::cout << "Sorted list:\n";
+    std::cout << "Sorted list (stack):\n";
     std::vector<int> vecList{};
     
     tictoc.reset();

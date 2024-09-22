@@ -1,6 +1,7 @@
 #include "Bst.h" // dummy
 #include <algorithm>
 #include <cmath>
+#include "DLList.h"
 #include <exception>
 #include <iostream>
 #include <queue>
@@ -37,7 +38,7 @@ void BinarySearchTree<T>::_insertNode(Node*& node, const T& data, int depth, std
 {
     if (node != nullptr)
     {
-        if (*node < data || *node == data)
+        if (*(node->m_elementPointer->dataPointer) < data || *(node->m_elementPointer->dataPointer) == data)
         {
             _insertNode(node->right, data, depth+1, label);
         }
@@ -69,7 +70,7 @@ void BinarySearchTree<std::string>::_insertNode(Node*& node, const std::string& 
 {
     if (node != nullptr)
     {
-        if (*node < data || *node == data)
+        if (*(node->m_elementPointer->dataPointer) < data || *(node->m_elementPointer->dataPointer) == data)
         {
             _insertNode(node->right, data, depth+1, label);
         }
@@ -111,8 +112,8 @@ void BinarySearchTree<T>::deleteNode(const T& data)
 {
     if (m_maxBalanceFactor>0)
     {
-        std::size_t count{ findNodes(data) };
-        for (std::size_t i{0}; i<count; i++)
+        std::size_t n{ count(data) };
+        for (std::size_t i{0}; i<n; i++)
         {
             m_root = _deleteNode(m_root, data);
             _rotate();
@@ -127,7 +128,7 @@ typename BinarySearchTree<T>::Node* BinarySearchTree<T>::_deleteNode(Node* node,
 {
     if (node != nullptr)
     {
-        if (*node == data)
+        if (*(node->m_elementPointer->dataPointer) == data)
         {
             if (node->m_height == 0)
             {
@@ -154,7 +155,7 @@ typename BinarySearchTree<T>::Node* BinarySearchTree<T>::_deleteNode(Node* node,
                 // no change in depth
             }
         }
-        else if (*node < data)
+        else if (*(node->m_elementPointer->dataPointer) < data)
         {
             node->right = _deleteNode(node->right, data);
         }
@@ -187,7 +188,7 @@ typename BinarySearchTree<T>::Node* BinarySearchTree<T>::_deleteNodes(Node* node
 {
     if (node != nullptr)
     {
-        if (*node == data)
+        if (*(node->m_elementPointer->dataPointer) == data)
         {
             if (node->m_height == 0)
             {
@@ -203,7 +204,7 @@ typename BinarySearchTree<T>::Node* BinarySearchTree<T>::_deleteNodes(Node* node
             else if (node->left == nullptr && node->right != nullptr)
             {
                 Node* ptr{ nullptr };
-                while (node != nullptr && *node == data)
+                while (node != nullptr && *(node->m_elementPointer->dataPointer) == data)
                 {
                     ptr = node;
                     node = node->right;
@@ -283,48 +284,50 @@ bool BinarySearchTree<T>::_isUnbalanced(Node* node)
 }
 
 template<typename T>
-std::size_t BinarySearchTree<T>::findNodes(const T& data) const
+typename DLList<T>::Iterator BinarySearchTree<T>::find(const T& data)
 {
+
+    Node* node{ m_root };
+
+    while (node != nullptr)
+    {
+        if (*(node->m_elementPointer->dataPointer) == data)
+        {
+            return typename DLList<T>::Iterator{node->m_elementPointer};
+        }
+        else if (*(node->m_elementPointer->dataPointer) < data)
+        {
+            node = node->right;
+        }
+        else
+            node = node->left;
+    }
+    return m_elements.end();
+}
+
+template<typename T>
+std::size_t BinarySearchTree<T>::count(const T& data) const
+{
+
     std::size_t ans{0};
 
-    if (m_root != nullptr)
-    {
-        Node* node{ m_root };
+    Node* node{ m_root };
 
-        while (true)
+    while (node != nullptr)
+    {
+        if (*(node->m_elementPointer->dataPointer) == data)
         {
-            if (*node == data)
-            {
-                ans++;
-                if (node->right != nullptr)
-                {
-                    node = node->right;    // duplicates may exist in right subtree
-                }
-                else
-                    return ans;
-            }
-            else if (*node < data)
-            {
-                if (node->right != nullptr)
-                {
-                    node = node->right;
-                }
-                else
-                    return ans;
-            }
-            else
-            {
-                if (node->left != nullptr)
-                {
-                    node = node->left;
-                }
-                else
-                    return ans;
-            }
+            ans++;
+            node = node->right;    // duplicates may exist in right subtree
         }
+        else if (*(node->m_elementPointer->dataPointer) < data)
+        {
+            node = node->right;
+        }
+        else
+            node = node->left;
     }
-    else
-        return 0;
+    return ans;
 }
 
 template<typename T>

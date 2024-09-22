@@ -56,10 +56,6 @@ protected:
 
         void setLabel(std::string label){ m_label = label; }
 
-        bool operator==(const T& data) const { return *(m_elementPointer->dataPointer) == data; }
-
-        bool operator<(const T& data) const { return *(m_elementPointer->dataPointer) < data; }
-
         virtual ~Node()
         {
         }
@@ -120,13 +116,15 @@ public:
 
     Iterator end(){ return m_elements.end(); }
 
-    void clear(){ _deleteTree(m_root); }
+    Iterator find(const T& data);
 
-    std::size_t findNodes(const T& data) const;
+    std::size_t count(const T& data) const;
     
     int getHeight() const { return m_root->m_height; }
 
     std::vector<T> getSequence();
+
+    void clear(){ _deleteTree(m_root); }
 
     void printTree();
 
