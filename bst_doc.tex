@@ -28,11 +28,11 @@
 This document introduces the idea of how the self-balancing AVL binary search trees (BST) can be generalised through rotation.
 
 \section{Recap: AVL binary search tree}
-A sequence of $n$ data structures can be stored in a BST for quick search, where each data structure represents a \textit{node} in the tree. Each data structure $i$ of the set $\Omega$ needs only have the `less than' operator $<$ defined on $\Omega$. We begin with an $n=3$ example. Figure.~\ref{fig:tree3} shows a binary search tree for elements $A$, $B$ and $C$, where $B<A<C$. Each of the cases represent a different sequence of insertion. In general, all nodes in the left sub-tree of a node has values smaller than that of the node's, and all nodes in the right sub-tree has values equal or greater.
+A sequence of $n$ element can be stored in a BST for quick search, where each element represents a \textit{node} in the tree. Each element $i$ of the set $\Omega$ needs only have the `less than' operator $<$ defined on $\Omega$. We begin with an $n=3$ example. Figure.~\ref{fig:tree3} shows a binary search tree for elements $A$, $B$ and $C$, where $B<A<C$. Each of the cases represent a different sequence of insertion. In general, all nodes in the left sub-tree of a node has values smaller than that of the node's, and all nodes in the right sub-tree has values equal or greater.
 
 \vspace{5mm}
 
-The \textit{height} $h$ of a node is minimum distance from a leave node, with the latter having height $h=0$. Figure.~\ref{fig:tree3h} shows the node heights of the respective cases in Fig.~\ref{fig:tree3}. The \textit{balance factor} $b$ of a node, is defined by $b=h_L- h_R$, where $h_L$ and $h_R$ are the heights of the left and right children, respectively. As some nodes may have only one child, we assign the value $h=-1$ for the `missing' child. Figure.~\ref{fig:tree3b} shows the node balance factors for the corresponding examples of Fig.~\ref{fig:tree3}.
+The node without a parent is the root node, and the nodes without children are leaf nodes. The \textit{height} $h$ of a node is maximum distance from a leaf node under it, with the latter having height $h=0$. Figure.~\ref{fig:tree3h} shows the node heights of the respective cases in Fig.~\ref{fig:tree3}. The \textit{balance factor} $b$ of a node, is defined by $b=h_L- h_R$, where $h_L$ and $h_R$ are the heights of the left and right children, respectively. As some nodes may have only one child, we assign the value $h=-1$ for the `missing' child. Figure.~\ref{fig:tree3b} shows the node balance factors for the corresponding examples of Fig.~\ref{fig:tree3}.
 
 \vspace{5mm}
 
