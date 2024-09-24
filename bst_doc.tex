@@ -1,0 +1,785 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{tikz-qtree}
+\usepackage{forest}
+\usepackage{float}
+\usepackage{subcaption}
+\usepackage{hyperref}
+
+\newcommand{\psih}{\ensuremath{\hat{\psi}_0}}
+\newcommand{\eh}{\ensuremath{\hat{\mathcal{E}}}}
+\newcommand{\vp}[1]{\ensuremath{v_{\parallel #1}}}
+\newcommand{\ts}[1]{\ensuremath{\theta_{\star #1}}}
+\newcommand{\Ts}[1]{\ensuremath{\Theta_{\star #1}}}
+\newcommand{\bstar}[1]{\ensuremath{B_{\parallel #1}^\star}}
+\newcommand{\dint}[1]{\ensuremath{\,\text{d}#1}}
+\newcommand{\NL}{\ensuremath{\nonumber\\}}
+
+\title{Generalised AVL Binary Search Trees}
+\author{Moahan Murugappan}
+\date{September 2024}
+
+\begin{document}
+
+\maketitle
+
+This document introduces the idea of how the self-balancing AVL binary search trees (BST) can be generalised through rotation.
+
+\section{Recap: AVL binary search tree}
+A sequence of $n$ data structures can be stored in a BST for quick search, where each data structure represents a \textit{node} in the tree. Each data structure $i$ of the set $\Omega$ needs only have the `less than' operator $<$ defined on $\Omega$. We begin with an $n=3$ example. Figure.~\ref{fig:tree3} shows a binary search tree for elements $A$, $B$ and $C$, where $B<A<C$. Each of the cases represent a different sequence of insertion. In general, all nodes in the left sub-tree of a node has values smaller than that of the node's, and all nodes in the right sub-tree has values equal or greater.
+
+\vspace{5mm}
+
+The \textit{height} $h$ of a node is minimum distance from a leave node, with the latter having height $h=0$. Figure.~\ref{fig:tree3h} shows the node heights of the respective cases in Fig.~\ref{fig:tree3}. The \textit{balance factor} $b$ of a node, is defined by $b=h_L- h_R$, where $h_L$ and $h_R$ are the heights of the left and right children, respectively. As some nodes may have only one child, we assign the value $h=-1$ for the `missing' child. Figure.~\ref{fig:tree3b} shows the node balance factors for the corresponding examples of Fig.~\ref{fig:tree3}.
+
+\vspace{5mm}
+
+An AVL binary search tree is one that has each of its node having
+\begin{eqnarray}
+    |b| &\leq& 1. \label{eq:avl}
+\end{eqnarray}
+When such a condition is satisfied, the BST is termed \textit{balanced}. A BST that maintains Eq.~\ref{eq:avl} after every element insertion (and deletion) is term `self-balancing'. From Fig.~\ref{fig:tree3b}, we can see that only the example Fig.~\ref{fig:ABC} is balanced. A balanced BST ensures that searching an element goes like $\mathcal{O}(\log n)$. The balancing mechanism, for the AVL BST involves the \textit{rotation} of 3 nodes. The R (right) and LR (left-right) rotations are demonstrated via Figs.~\ref{fig:avlR} and \ref{fig:avlLR}. The left-right mirror cases of L (left) and RL (right-left) rotations are easily inferred. In Figs.~\ref{fig:avlR} and \ref{fig:avlLR}, the leading node ($C$) is chosen such that it is the node with $|b|=2$, of minimum $h$, above the node that has just been inserted or deleted.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em}
+        [A
+            [B] [C]
+        ]
+        \end{forest}
+        \caption{$\{A,B,C\}$, $\{A,C,B\}$}
+        \label{fig:ABC}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em, grow=-45}
+        [B
+            [C, for tree={grow'=-135}
+                [A]
+            ]
+        ]
+        \end{forest}
+        \caption{$\{B,C,A\}$}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em, grow=-45}
+        [B
+            [A
+                [C]
+            ]
+        ]
+        \end{forest}
+        \caption{$\{B,A,C\}$}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em, grow=-135}
+        [C
+            [A
+                [B]
+            ]
+        ]
+        \end{forest}
+        \caption{$\{C,A,B\}$}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em, grow=-135}
+        [C
+            [B, for tree={grow=-45}
+                [A]
+            ]
+        ]
+        \end{forest}
+        \caption{$\{C,B,A\}$}
+    \end{subfigure}
+    \caption{An $n=3$ binary search tree example for elements $A$, $B$ and $C$ with $B<A<C$. Each cases represents different sequence of insertion, starting from the first element. For the example of Fig.\ref{fig:ABC}, $A$ is the parent node, with $B$ and $C$ its children. Also in Fig.\ref{fig:ABC}, $A$ is the root node, and $B$ and $C$ are the leaf nodes. Edges (lines connecting nodes) slanting to the left represent the child being `smaller' $<$, than the parent, while to the right represent `greater or equal'. }
+    \label{fig:tree3}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em}
+        [1
+            [0] [0]
+        ]
+        \end{forest}
+        \caption{$\{A,B,C\}$, $\{A,C,B\}$}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em, grow=-45}
+        [2
+            [1, for tree={grow'=-135}
+                [0]
+            ]
+        ]
+        \end{forest}
+        \caption{$\{B,C,A\}$}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em, grow=-45}
+        [2
+            [1
+                [0]
+            ]
+        ]
+        \end{forest}
+        \caption{$\{B,A,C\}$}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em, grow=-135}
+        [2
+            [1
+                [0]
+            ]
+        ]
+        \end{forest}
+        \caption{$\{C,A,B\}$}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em, grow=-135}
+        [2
+            [1, for tree={grow=-45}
+                [0]
+            ]
+        ]
+        \end{forest}
+        \caption{$\{C,B,A\}$}
+    \end{subfigure}
+    \caption{Node height $h$ for the corresponding examples in Fig.~\ref{fig:tree3}. }
+    \label{fig:tree3h}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em}
+        [0
+            [0] [0]
+        ]
+        \end{forest}
+        \caption{$\{A,B,C\}$, $\{A,C,B\}$}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em, grow=-45}
+        [-2
+            [1, for tree={grow=-135}
+                [0]
+            ]
+        ]
+        \end{forest}
+        \caption{$\{B,C,A\}$}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em, grow=-45}
+        [-2
+            [-1
+                [0]
+            ]
+        ]
+        \end{forest}
+        \caption{$\{B,A,C\}$}
+        \label{fig:s1}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em, grow=-135}
+        [2
+            [1
+                [0]
+            ]
+        ]
+        \end{forest}
+        \caption{$\{C,A,B\}$}
+        \label{fig:s2}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em, grow=-135}
+        [2
+            [-1, for tree={grow=-45}
+                [0]
+            ]
+        ]
+        \end{forest}
+        \caption{$\{C,B,A\}$}
+    \end{subfigure}
+    \caption{Balance factor $b=h_L-h_R$ for the corresponding examples in Fig.~\ref{fig:tree3}, with $h_L$ and $h_R$ being the node height values of the left and right child, respectively. `Missing' child is assigned $h=-1$. Note that for $b<0$, the tree slants to the left, and vice versa. }
+    \label{fig:tree3b}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em, grow=-135}
+        [$S$
+            [\color{red} $C$, for tree={grow=-90}
+                [\color{red} $A$
+                    [\color{red} $B$
+                        [$B_L$] [$B_R$]
+                    ] [$A_R$] 
+                ] [$C_R$]
+            ]
+        ]
+        \end{forest}
+        \caption{Unbalanced}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em, grow=-135}
+        [$S$
+            [\color{red} $A$, for tree={grow=-90}
+                [\color{red} $B$ 
+                    [$B_L$] [$B_R$]
+                ]
+                [\color{red} $C$
+                    [$A_R$] [$C_R$]
+                ]
+            ]
+        ]
+        \end{forest}
+        \caption{Balanced}
+    \end{subfigure}
+    \caption{R rotation. $S$ represents an arbitrary parent node. $A_R$, $B_L$, $B_R$ and $C_R$ represent sub-trees. The red 3-node sequence for the AVL BST case is chosen such that $C$ has $b=2$.}
+    \label{fig:avlR}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em, grow=-135}
+        [$S$
+            [\color{red} $C$, for tree={grow=-90}
+                [\color{red} $A$
+                    [$A_L$] [\color{red} $B$
+                                [$B_L$] [$B_R$]
+                            ]
+                ] [$C_R$]
+            ]
+        ]
+        \end{forest}
+        \caption{Unbalanced}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em, grow=-135}
+        [$S$
+            [\color{red} $C$, for tree={grow=-90}
+                [\color{red} $A$
+                    [$A_L$] [\color{red} $B$
+                                [$B_L$] [$B_R$]
+                            ]
+                ] [$C_R$]
+            ]
+        ]
+        \end{forest}
+        \caption{Unbalanced}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em, grow=-135}
+        [$S$
+            [\color{red} $B$, for tree={grow=-90}
+                [\color{red} $A$ 
+                    [$A_L$] [$B_L$]
+                ]
+                [\color{red} $C$
+                    [$B_R$] [$C_R$]
+                ]
+            ]
+        ]
+        \end{forest}
+        \caption{Balanced}
+    \end{subfigure}
+    \caption{LR rotation. $S$ represents an arbitrary parent node. $A_L$, $B_L$, $B_R$ and $C_R$ represent sub-trees. The red 3-node sequence for the AVL BST case is chosen such that $C$ has $b=2$.}
+    \label{fig:avlLR}
+\end{figure}
+
+\section{Generalisation on rotation}
+
+Generalisation of the AVL BST balancing mechanism can be made by two ways. The first is to relax Eq.~\ref{eq:avl}, i.e. the minimum absolute node balance factor value, above which the BST is considered unbalanced. That is,
+\begin{eqnarray}
+    |b| &\le& m \label{eq:gen}
+\end{eqnarray}
+for the BST to be balanced. $m=1$ for AVL BST. The second is that for $m>1$, the number of nodes considered for rotation can be increased. Define this value to be the \textit{rotation length} $l$. Generally,
+\begin{eqnarray}
+     3 \le &l& \le m+2. \nonumber
+\end{eqnarray}
+The following subsections demonstrate the varying of parameters $m$ and $l$ via examples.
+
+\subsection{Balance factor threshold, $m$}
+
+For the example of this subsection, $l=3$. Consider the sequence $\Omega=\{9,7,5,3,1\}$ to be inserted into a BST. The self-balancing of cases $m=1$ and $m=2$ are shown in Figs.~\ref{fig:tree13} and \ref{fig:tree23}, respectively.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em, grow=-135}
+        [$9_0^0$]
+        \end{forest}
+        \caption{Balanced}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em, grow=-135}
+        [$9_1^1$
+            [$7_0^0$]
+        ]
+        \end{forest}
+        \caption{Balanced}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em, grow=-135}
+        [\color{red} $9_2^2$
+            [\color{red} $7_1^1$
+                [\color{red} $5_0^0$]
+            ]
+        ]
+        \end{forest}
+        \caption{Unbalanced}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em}
+        [$7_1^0$
+            [$5_0^0$] [$9_0^0$]
+        ]
+        \end{forest}
+        \caption{Balanced}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em}
+        [$7_2^1$
+            [$5_1^1$, for tree={grow=-135}
+                [$3_0^0$]
+            ] [$9_0^0$]
+        ]
+        \end{forest}
+        \caption{Balanced}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em}
+        [$7_3^2$
+            [\color{red} $5_2^2$, for tree={grow=-135}
+                [\color{red} $3_1^1$
+                    [\color{red} $1_0^0$]
+                ]
+            ] [$9_0^0$]
+        ]
+        \end{forest}
+        \caption{Unbalanced}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em}
+        [$7_2^1$
+            [$3_1^0$
+                [$1_0^0$] [$5_0^0$]
+            ] [$9_0^0$]
+        ]
+        \end{forest}
+        \caption{Balanced}
+    \end{subfigure}
+    \caption{Balancing mechanism for AVL ($m=1$, $l=3$) BST for the sequence $\Omega=\{9,7,5,3,1\}$. Subscripts and superscripts indicate height $h$ and balance factor $b$ for each node. The ($l=3$) red nodes are to be considered for rotation for the next step.}
+    \label{fig:tree13}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em, grow=-135}
+        [$9_0^0$]
+        \end{forest}
+        \caption{Balanced}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em, grow=-135}
+        [$9_1^1$
+            [$7_0^0$]
+        ]
+        \end{forest}
+        \caption{Balanced}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em, grow=-135}
+        [$9_2^2$
+            [$7_1^1$
+                [$5_0^0$]
+            ]
+        ]
+        \end{forest}
+        \caption{Balanced}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em, grow=-135}
+        [\color{red} $9_3^3$
+            [\color{red} $7_2^2$
+                [\color{red} $5_1^1$
+                    [$3_0^0$]
+                ]
+            ]
+        ]
+        \end{forest}
+        \caption{Unbalanced}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em}
+        [$7_2^1$
+            [$5_1^1$, for tree={grow=-135}
+                [$3_0^0$]
+            ] [$9_0^0$]
+        ]
+        \end{forest}
+        \caption{Balanced}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em}
+        [$7_3^2$
+            [$5_2^1$, for tree={grow=-135}
+                [$3_1^0$
+                    [$1_0^0$]
+                ]
+            ] [$9_0^0$]
+        ]
+        \end{forest}
+        \caption{Balanced}
+    \end{subfigure}
+    \caption{Balancing mechanism for $m=2$, $l=3$, BST for the sequence $\Omega=\{9,7,5,3,1\}$. Subscripts and superscripts indicate height $h$ and balance factor $b$ for each node. The ($l=3$) red nodes are to be considered for rotation in the next step.}
+    \label{fig:tree23}
+\end{figure}
+
+\subsection{Rotation length, $l$}
+
+Consider again the sequence $\Omega=\{9,7,5,3,1\}$, but now with $m=2$ and $l=4$. The self balancing mechanism is shown in Fig.~\ref{fig:tree24}. Note that, when compared to the ($m=2$,$l=3$) case of Fig.~\ref{fig:tree23}, this ($m_2$,$l=4$) case has a different BST height, i.e. height of root node.
+
+\vspace{5mm}
+
+As a final example, consider the sequence $\Omega=\{40,20,10,25,30,22,28\}$, to be inserted into the BST with $m=3$ and $l=4$. This case demonstrates the self balancing mechanism when the nodes being considered for rotation are not `straight', like that of Fig.~\ref{fig:s1} or Fig.~\ref{fig:s2} (but of length $l=4$). As shown in Fig.~\ref{fig:tree44}, the idea is to straighten the $l$ nodes, and then bend $\lfloor l/2 \rfloor$ of them via sequence of 3-node rotations. The sense of straightening depends on the $b$ value of the leading node considered for rotation, i.e. for $b<0$, the nodes descend to the left, and vice versa. \textbf{Comparing with the standard AVL ($m=1$,$l=3$) balancing for the same sequence in Fig.~\ref{fig:treecom}, the ($m=3$,$l=4$) balancing BST saves 1 rotation step, i.e. 5 against 4.}
+ 
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em, grow=-135}
+        [$9_0^0$]
+        \end{forest}
+        \caption{Balanced}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em, grow=-135}
+        [$9_1^1$
+            [$7_0^0$]
+        ]
+        \end{forest}
+        \caption{Balanced}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em, grow=-135}
+        [$9_2^2$
+            [$7_1^1$
+                [$5_0^0$]
+            ]
+        ]
+        \end{forest}
+        \caption{Balanced}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em, grow=-135}
+        [\color{red} $9_3^3$
+            [\color{red} $7_2^2$
+                [\color{red} $5_1^1$
+                    [\color{red} $3_0^0$]
+                ]
+            ]
+        ]
+        \end{forest}
+        \caption{Unbalanced}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em}
+        [$5_2^{-1}$
+            [$3_0^0$]   [$7_1^{-1}$, for tree={grow=-45}
+                            [$9_0^0$]
+                        ]
+        ]
+        \end{forest}
+        \caption{Balanced}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em}
+        [$5_2^0$
+            [$3_1^1$, for tree={grow=-135}
+                [$1_0^0$]
+            ]   [$7_1^{-1}$, for tree={grow=-45}
+                    [$9_0^0$]
+                ]
+        ]
+        \end{forest}
+        \caption{Balanced}
+    \end{subfigure}
+    \caption{Balancing mechanism for $m=2$, $l=3$, BST for the sequence $\Omega=\{9,7,5,3,1\}$. Subscripts and superscripts indicate height $h$ and balance factor $b$ for each node. The ($l=3$) red nodes are to considered for rotation in the next step.}
+    \label{fig:tree24}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em, grow=-135}
+        [$40_3^3$, for tree={grow=-135}
+            [$20_2^{-1}$, for tree={grow=-90}
+                [$10_0^0$]  [$25_1^0$
+                            [$22_0^0$]  [$30_0^0$]
+                        ]
+            ]
+        ]
+        \end{forest}
+        \caption{Balanced}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em, grow=-135}
+        [\color{blue} $40_4^4$, for tree={grow=-135}
+            [\color{red} $20_3^{-2}$, for tree={grow=-90}
+                [$10_0^0$]  [\color{red} $25_2^{-1}$
+                            [$22_0^0$]  [\color{red} $30_1^{-1}$, for tree={grow=-70}
+                                            [$28_0^0$]
+                                        ]
+                        ]
+            ]
+        ]
+        \end{forest}
+        \caption{Unbalanced}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em, grow=-135}
+        [\color{blue} $40_3^3$, for tree={grow=-135}
+            [\color{red} $25_2^0$, for tree={grow=-90}
+                [\color{red} $20_1^0$
+                    [$10_0^0$]  [$22_0^0$]
+                ]
+                [\color{red} $30_1^1$, for tree={grow=-110}
+                    [$28_0^0$]
+                ]
+            ]
+        ]
+        \end{forest}
+        \caption{Mid-balancing}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em, grow=-135}
+        [\color{red} $40_4^4$
+            [\color{red} $30_3^3$
+                [\color{red} $25_2^1$, for tree={grow=-90}
+                    [\color{blue} $20_1^0$
+                        [$10_0^0$]  [$22_0^0$]
+                    ]
+                    [$28_0^0$]
+                ]
+            ]
+        ]
+        \end{forest}
+        \caption{Mid-balancing}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em, grow=-135}
+        [\color{red} $30_3^2$, for tree={grow=-90}
+            [\color{red} $25_2^1$
+                [\color{red} $20_1^0$
+                    [$10_0^0$]  [$22_0^0$]
+                ]
+                [$28_0^0$]
+            ]
+            [$40_0^0$]
+        ]
+        \end{forest}
+        \caption{Mid-balancing}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em}
+        [$25_2^0$
+            [$20_1^0$
+                [$10_0^0$]  [$22_0^0$]
+            ]
+            [$30_1^0$
+                [$28_0^0$]  [$40_0^0$]
+            ]
+        ]
+        \end{forest}
+        \caption{Balanced}
+    \end{subfigure}
+    \caption{Balancing mechanism for $m=3$, $l=4$, BST for the sequence $\Omega=\{40,20,10,25,30,22,28\}$. Subscripts and superscripts indicate height $h$ and balance factor $b$ for each node. Red indicates the nodes considered for rotation in the next step. The blue nodes are to be consider for rotation only in subsequent steps. Each rotation step involves only 3 (red) nodes. A total of 4 rotations have been executed for this case.}
+    \label{fig:tree44}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em, grow=-135}
+        [\color{red} $40_2^2$
+            [\color{red} $20_1^1$
+                [\color{red} $10_0^0$]
+            ]
+        ]
+        \end{forest}
+        \caption{$\Omega=\{\dots,25,30,22,28\}$}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em}
+        [$20_3^{-2}$
+            [$10_0^0$]  [\color{red} $40_2^{2}$, for tree={grow=-105}
+                            [\color{red} $25_1^{-1}$, for tree={grow=-75}
+                                [\color{red} $30_0^0$]
+                            ]
+                        ]
+        ]
+        \end{forest}
+        \caption{$\Omega=\{\dots,22,28\}$}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em}
+        [$20_3^{-2}$
+            [$10_0^0$]  [\color{red} $40_2^{2}$, for tree={grow=-105}
+                            [\color{red} $30_1^1$
+                                [\color{red} $25_0^0$]
+                            ]
+                        ]
+        ]
+        \end{forest}
+        \caption{$\Omega=\{\dots,22,28\}$}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em}
+        [\color{red} $20_3^{-2}$
+            [$10_0^0$]  [\color{red} $30_2^1$
+                            [\color{red} $25_1^1$, for tree={grow=-105}
+                                [$22_0^0$]
+                            ]   [$40_0^0$]
+                        ]
+        ]
+        \end{forest}
+        \caption{$\Omega=\{\dots,28\}$}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em}
+        [\color{red} $20_3^{-2}$
+            [$10_0^0$]  [\color{red} $25_2^{-1}$
+                            [$22_0^0$]  [\color{red} $30_1^{-1}$, for tree={grow=-75}
+                                        [$40_0^0$]
+                                    ]
+                        ]
+        ]
+        \end{forest}
+        \caption{$\Omega=\{\dots,28\}$}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \begin{forest}
+        for tree={circle, draw, minimum size=1.5em}
+        [$25_2^0$
+            [$20_1^0$
+                [$10_0^0$]  [$22_0^0$]
+            ]
+            [$30_1^0$
+                [$28_0^0$]  [$40_0^0$]
+            ]
+        ]
+        \end{forest}
+        \caption{Balanced}
+    \end{subfigure}
+    \caption{Balancing mechanism for $m=1$, $l=3$, (AVL) BST for the sequence $\Omega=\{40,20,10,25,30,22,28\}$. Subscripts and superscripts indicate height $h$ and balance factor $b$ for each node. Red indicates the nodes considered for rotation in the next step. A total of 5 rotations have been executed for this case.}
+    \label{fig:treecom}
+\end{figure}
+
+
+\end{document}
