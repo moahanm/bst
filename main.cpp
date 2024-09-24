@@ -108,9 +108,9 @@ int main()
     // }
 
     {
-    std::cout << "2-5 rotation tests:\n";
+    std::cout << "2-4 rotation tests:\n";
     BinarySearchTree<int> bst{2};
-    bst.setRotationLength(5);
+    bst.setRotationLength(4);
     bst.insertNode({90,70,50,30,10},{"90","70","50","30","10"});
     bst.printTree();
     /* answer
