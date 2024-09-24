@@ -239,7 +239,7 @@ void BinarySearchTree<T>::setRotationLength(const std::size_t rotationLength)
     if (rotationLength < 3)
         throw std::runtime_error("rotation length must be at least 3");
     
-    if (rotationLength > 2*m_maxBalanceFactor + 1)
+    if (rotationLength > m_maxBalanceFactor + 2)
         throw std::runtime_error("rotation length must be at most maximum balance factor + 2");
 
     m_rotationLength = rotationLength;
